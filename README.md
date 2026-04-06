@@ -22,7 +22,7 @@ npm install
 npm run dev
 ```
 
-Open **http://localhost:3000** (default). To use port **3947**: `npm run dev:3947`.
+Open **http://localhost:3947** (dev server port is set in `package.json`).
 
 ### If Vercel shows 404 but the build is “Ready”
 
