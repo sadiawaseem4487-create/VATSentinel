@@ -47,6 +47,18 @@ export async function GET() {
      * missing https://, extra quotes, etc.). Fix the value and redeploy.
      */
     n8nSubmitWebhookUrlRejected: Boolean(rawSubmit && !cleanedSubmit),
+    /**
+     * Plain-language hint when submit webhook is not active. `vercelEnv` is
+     * `preview` | `production` | `development` on Vercel — each needs env vars
+     * enabled for that scope (Preview vs Production are separate checkboxes).
+     */
+    ...(!cleanedSubmit
+      ? {
+          n8nSubmitWebhookHint: rawSubmit
+            ? "N8N_WEBHOOK_URL is set but rejected — use https:// production URL from n8n (not webhook-test), no quotes or placeholders."
+            : "N8N_WEBHOOK_URL is unset for this deployment — in Vercel → Settings → Environment Variables, add it and tick Preview and Production (match vercelEnv above), then Redeploy.",
+        }
+      : {}),
     ...(ok
       ? {}
       : {
