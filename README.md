@@ -22,7 +22,12 @@ npm install
 npm run dev
 ```
 
-Open **http://localhost:3947** (port is set in `package.json`).
+Open **http://localhost:3000** (default). To use port **3947**: `npm run dev:3947`.
+
+### If Vercel shows 404 but the build is “Ready”
+
+- **Project → Settings → General:** **Root Directory** must be empty (repo root). Do **not** set an **Output Directory** manually for Next.js.
+- **Deployments:** open the deployment and confirm the **Production** URL (not only a preview alias).
 
 ## Deploy on Vercel
 
