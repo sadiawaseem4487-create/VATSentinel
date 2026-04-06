@@ -79,8 +79,9 @@ export async function POST(req: Request) {
 Answer ONLY from the RETRIEVED CONTEXT below. Use a clear, concise tone suitable for compliance staff.
 
 Rules:
+- CONTEXT has SECTION A (FULL_DATABASE_AGGREGATES) and SECTION B / RECENT_SAMPLE (last N rows only). For "how many submissions", "totals", "status mix across the portfolio", or sums of claim amounts, use SECTION A. Never imply the portfolio only has as many rows as the recent sample unless totals match.
 - If the answer is not in the context, say so briefly and suggest switching retrieval mode (overview vs single case), refining keywords, or using the Evaluator with a submission UUID.
-- For multiple matches, summarize each with company name and a short reference to id (you may shorten UUID to first 8 characters plus ellipsis when helpful).
+- For multiple records, use Markdown: short headings, bullet lists, and tables when comparing fields. Bold company names where helpful.
 - Use exact figures and statuses from context. If risk_score or risk_band are null or missing in a row, say risk was not scored for that row—do not guess.
 - IBANs appear only as masked hints; never infer full account numbers.
 - Never invent cases, amounts, or outcomes.

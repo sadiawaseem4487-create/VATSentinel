@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -22,6 +24,28 @@ function formatRetrievalNote(note: string): string {
     error: "data could not be loaded this turn",
   };
   return map[note] ?? note.replace(/_/g, " ");
+}
+
+function AssistantMessageBody({ text }: { text: string }) {
+  return (
+    <div className="assistant-md text-sm leading-relaxed text-slate-800 [&_p]:mb-3 [&_p:last-child]:mb-0 [&_h1]:mb-2 [&_h1]:text-base [&_h1]:font-semibold [&_h2]:mb-2 [&_h2]:mt-3 [&_h2]:text-sm [&_h2]:font-semibold [&_h3]:mb-1 [&_h3]:mt-2 [&_h3]:text-sm [&_h3]:font-semibold [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:my-0.5 [&_table]:my-3 [&_table]:w-full [&_table]:border-collapse [&_table]:text-xs [&_th]:border [&_th]:border-slate-200 [&_th]:bg-slate-50 [&_th]:px-2 [&_th]:py-1.5 [&_th]:text-left [&_td]:border [&_td]:border-slate-200 [&_td]:px-2 [&_td]:py-1.5 [&_code]:rounded [&_code]:bg-slate-100 [&_code]:px-1 [&_code]:font-mono [&_code]:text-[0.8rem] [&_pre]:overflow-x-auto [&_pre]:rounded-lg [&_pre]:bg-slate-50 [&_pre]:p-1">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          a: ({ className, ...props }) => (
+            <a
+              {...props}
+              className={`font-medium text-emerald-800 underline decoration-emerald-400/70 underline-offset-2 hover:text-emerald-950 ${className ?? ""}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            />
+          ),
+        }}
+      >
+        {text}
+      </ReactMarkdown>
+    </div>
+  );
 }
 
 function AssistantAvatar() {
@@ -295,9 +319,10 @@ function ChatPageContent() {
               </div>
             ) : (
               <p className="mt-3 text-xs leading-relaxed text-slate-600">
-                Uses total count plus the most recent submissions (capped for
-                speed). Ask about status mix, amounts, or patterns in this
-                sample.
+                Portfolio overview uses <strong>full-table</strong> counts and
+                sums from Supabase, plus a <strong>sample</strong> of the most
+                recent rows for detail. Ask about totals, status mix, or
+                exposure across the whole database.
               </p>
             )}
           </div>
@@ -348,9 +373,9 @@ function ChatPageContent() {
                             Assistant
                           </span>
                           <div className="mt-1 rounded-2xl rounded-tl-md border border-slate-200 bg-white px-4 py-3 text-sm leading-relaxed text-slate-800 shadow-sm ring-1 ring-slate-950/[0.02]">
-                            <p className="whitespace-pre-wrap break-words">
-                              {msg.text}
-                            </p>
+                            <div className="break-words">
+                              <AssistantMessageBody text={msg.text} />
+                            </div>
                           </div>
                           {msg.meta && (
                             <p className="mt-2 text-[11px] text-slate-500">

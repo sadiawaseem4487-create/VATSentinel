@@ -98,6 +98,102 @@ function compactContext(rows: Record<string, unknown>[], maxChars: number): stri
   return `${JSON.stringify(trimmed, null, 2)}\n\n[…truncated for size; ask a narrower question or use single-case search.]`;
 }
 
+function getAggregateMaxRows(): number {
+  const n = Number(process.env.CHAT_AGGREGATE_MAX_ROWS);
+  if (Number.isFinite(n) && n > 0) return Math.min(Math.floor(n), 500_000);
+  return 100_000;
+}
+
+function getOverviewSampleLimit(): number {
+  const n = Number(process.env.CHAT_OVERVIEW_SAMPLE_SIZE);
+  if (Number.isFinite(n) && n >= 10 && n <= 200) return Math.floor(n);
+  return 75;
+}
+
+async function getCreatedAtBounds(
+  supabase: SupabaseClient
+): Promise<{ oldest: string | null; newest: string | null }> {
+  const { data: minRow } = await supabase
+    .from("submissions")
+    .select("created_at")
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  const { data: maxRow } = await supabase
+    .from("submissions")
+    .select("created_at")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return {
+    oldest:
+      typeof minRow?.created_at === "string" ? minRow.created_at : null,
+    newest:
+      typeof maxRow?.created_at === "string" ? maxRow.created_at : null,
+  };
+}
+
+type ScanAggregates = {
+  histogram: Record<string, number>;
+  sumByCurrency: Record<string, number>;
+  rowsScanned: number;
+  scanTruncated: boolean;
+  error?: string;
+};
+
+/**
+ * Paginated scan of `submissions` for status histogram and sum of claim amounts
+ * across the whole table (bounded by CHAT_AGGREGATE_MAX_ROWS).
+ */
+async function scanSubmissionsForAggregates(
+  supabase: SupabaseClient
+): Promise<ScanAggregates> {
+  const maxRows = getAggregateMaxRows();
+  const pageSize = 1000;
+  let from = 0;
+  const histogram: Record<string, number> = {};
+  const sumByCurrency: Record<string, number> = {};
+  let scanTruncated = false;
+
+  while (from < maxRows) {
+    const { data, error } = await supabase
+      .from("submissions")
+      .select("id, status, total_claim_amount, currency")
+      .order("id", { ascending: true })
+      .range(from, from + pageSize - 1);
+
+    if (error) {
+      return {
+        histogram,
+        sumByCurrency,
+        rowsScanned: from,
+        scanTruncated: false,
+        error: error.message,
+      };
+    }
+    if (!data?.length) break;
+
+    for (const row of data) {
+      const st = String(row.status ?? "unknown");
+      histogram[st] = (histogram[st] || 0) + 1;
+      const amt = row.total_claim_amount;
+      if (typeof amt === "number" && !Number.isNaN(amt)) {
+        const cur = String(row.currency ?? "EUR").trim() || "EUR";
+        sumByCurrency[cur] = (sumByCurrency[cur] || 0) + amt;
+      }
+    }
+
+    from += data.length;
+    if (data.length < pageSize) break;
+    if (from >= maxRows) {
+      scanTruncated = true;
+      break;
+    }
+  }
+
+  return { histogram, sumByCurrency, rowsScanned: from, scanTruncated };
+}
+
 export async function retrieveRagContext(
   supabase: SupabaseClient,
   scope: RagScope,
@@ -223,14 +319,21 @@ export async function retrieveRagContext(
     };
   }
 
-  const { data: recent, error } = await supabase
-    .from("submissions")
-    .select(SUBMISSIONS_SELECT)
-    .order("created_at", { ascending: false })
-    .limit(75);
+  const totalInDb = count ?? 0;
+  const sampleLimit = getOverviewSampleLimit();
 
-  if (error) {
-    console.error("[chatRag] overview list:", error.message);
+  const [bounds, scan, recentRes] = await Promise.all([
+    getCreatedAtBounds(supabase),
+    scanSubmissionsForAggregates(supabase),
+    supabase
+      .from("submissions")
+      .select(SUBMISSIONS_SELECT)
+      .order("created_at", { ascending: false })
+      .limit(sampleLimit),
+  ]);
+
+  if (recentRes.error) {
+    console.error("[chatRag] overview list:", recentRes.error.message);
     return {
       contextText: "",
       retrievedCount: 0,
@@ -242,14 +345,15 @@ export async function retrieveRagContext(
     };
   }
 
-  const rows = (recent || []) as Record<string, unknown>[];
-  const statusHistogram: Record<string, number> = {};
+  const rows = (recentRes.data || []) as Record<string, unknown>[];
+
+  const statusHistogramSample: Record<string, number> = {};
   for (const r of rows) {
     const s = String(r.status ?? "unknown");
-    statusHistogram[s] = (statusHistogram[s] || 0) + 1;
+    statusHistogramSample[s] = (statusHistogramSample[s] || 0) + 1;
   }
 
-  const highRisk = rows.filter((r) => {
+  const highRiskInSample = rows.filter((r) => {
     const sc = numericScore(r);
     const b = (band(r) || "").toUpperCase();
     if (sc != null && sc >= 70) return true;
@@ -257,19 +361,56 @@ export async function retrieveRagContext(
     return false;
   }).length;
 
-  const summary = {
-    total_submissions_in_database: count ?? rows.length,
-    note: "Histogram and high-risk count apply only to this retrieved sample. Numeric risk scores and risk bands are included only when those columns exist on your submissions table.",
+  const aggregatesComplete =
+    !scan.scanTruncated &&
+    !scan.error &&
+    scan.rowsScanned === totalInDb;
+
+  const fullDatabaseAggregates = {
+    total_submissions_in_database: totalInDb,
+    submission_created_at_range: {
+      oldest: bounds.oldest,
+      newest: bounds.newest,
+    },
+    status_counts:
+      scan.error != null ? { _error: scan.error } : scan.histogram,
+    aggregates_coverage:
+      scan.error != null
+        ? "Aggregates unavailable (scan failed); use sample below and total count only."
+        : aggregatesComplete
+          ? "Status counts and sums below are over ALL rows in the database."
+          : `Partial scan only: ${scan.rowsScanned} rows read (limit CHAT_AGGREGATE_MAX_ROWS=${getAggregateMaxRows()}). Counts and sums apply to scanned rows only; total_submissions_in_database is still exact.`,
+    sum_total_claim_amount_by_currency:
+      scan.error != null ? {} : scan.sumByCurrency,
+    rows_scanned_for_aggregates: scan.rowsScanned,
+    scan_truncated: scan.scanTruncated,
+  };
+
+  const recentSampleBlock = {
     sample_size: rows.length,
-    status_histogram_for_sample: statusHistogram,
-    high_risk_count_in_sample: highRisk,
+    sample_note: `Only the ${rows.length} most recent submissions (by created_at) are listed below for detail. Portfolio-wide figures are in FULL_DATABASE_AGGREGATES. Do not say there are only ${rows.length} companies if total_submissions_in_database is higher.`,
+    status_histogram_in_this_sample_only: statusHistogramSample,
+    high_risk_count_in_this_sample_only: highRiskInSample,
+    risk_columns_note:
+      "Risk scores and bands appear only when present on each row.",
   };
 
   const shaped = rows.map((r) => rowForLlm(r, "overview"));
   const body = compactContext(shaped, 26_000);
 
+  const contextText = `DATABASE OVERVIEW — ground answers ONLY in this JSON.
+
+SECTION A — FULL_DATABASE_AGGREGATES (use for portfolio totals, status mix, and sum of claim amounts):
+${JSON.stringify(fullDatabaseAggregates, null, 2)}
+
+SECTION B — RECENT_SAMPLE_FOR_DETAIL (examples and narrative; NOT an exhaustive list of all companies):
+${JSON.stringify(recentSampleBlock, null, 2)}
+
+RECENT_SUBMISSIONS_SAMPLE_ROWS:
+${body}`;
+
   return {
-    contextText: `DATABASE OVERVIEW (ground answers in this JSON only):\nSUMMARY:\n${JSON.stringify(summary, null, 2)}\n\nRECENT_SUBMISSIONS_SAMPLE:\n${body}`,
+    contextText,
     retrievedCount: rows.length,
     scope: "overview",
   };
