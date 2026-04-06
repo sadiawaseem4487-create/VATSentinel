@@ -91,6 +91,14 @@ export async function POST(req: Request) {
 
     // n8n: POST full saved row (plus event metadata). Top-level keys stay for older workflows.
     const webhookUrl = getN8nSubmitWebhookUrl();
+    type N8nNotify = {
+      skipped: boolean;
+      ok?: boolean;
+      httpStatus?: number;
+      error?: "fetch_failed";
+    };
+    let n8nNotify: N8nNotify = { skipped: true };
+
     if (webhookUrl) {
       try {
         const webhookPayload = {
@@ -116,11 +124,22 @@ export async function POST(req: Request) {
             webhookRes.status,
             webhookText.slice(0, 500)
           );
+          n8nNotify = {
+            skipped: false,
+            ok: false,
+            httpStatus: webhookRes.status,
+          };
         } else {
           console.log("n8n webhook OK:", webhookRes.status);
+          n8nNotify = {
+            skipped: false,
+            ok: true,
+            httpStatus: webhookRes.status,
+          };
         }
       } catch (webhookError) {
         console.error("n8n webhook failed:", webhookError);
+        n8nNotify = { skipped: false, ok: false, error: "fetch_failed" };
       }
     } else {
       console.warn(
@@ -128,7 +147,7 @@ export async function POST(req: Request) {
       );
     }
 
-    return NextResponse.json({ ok: true, id: data.id });
+    return NextResponse.json({ ok: true, id: data.id, n8n: n8nNotify });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });

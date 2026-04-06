@@ -56,6 +56,14 @@ Open **http://localhost:3947** (dev server port is set in `package.json`).
 4. **Redeploy** after saving variables.
 5. The app calls **Supabase**, **OpenRouter** (via `OPENAI_API_KEY`), and **n8n Cloud** webhooks from the server only.
 
+### n8n not running after submit
+
+1. **Env:** Set `N8N_WEBHOOK_URL` (and redeploy) to the **Production** webhook URL from n8n Cloud — same as in `.env.example`.
+2. **Workflow:** In n8n, the workflow must be **Active** (toggle on). Copy the **Webhook** node’s **Production URL** (not “Test URL” unless you use that deliberately).
+3. **Path:** URL must match your Webhook node path (e.g. `/webhook/vat-claim`).
+4. **Auth:** If the Webhook node uses **Authentication**, the app must send the same credentials (currently it sends JSON only — disable webhook auth for this integration or add headers in code).
+5. After submit, the success banner mentions if n8n was skipped or returned an error (HTTP status). Check **Vercel → Deployment → Functions / Logs** for `n8n webhook non-OK` if needed.
+
 ## Requirements
 
 - **Node.js** 20+ (see `engines` in `package.json`).

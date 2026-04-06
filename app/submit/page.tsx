@@ -251,8 +251,18 @@ export default function SubmitPage() {
         }),
       });
 
-      let data: { error?: string; hint?: string; id?: string; ok?: boolean } =
-        {};
+      let data: {
+        error?: string;
+        hint?: string;
+        id?: string;
+        ok?: boolean;
+        n8n?: {
+          skipped?: boolean;
+          ok?: boolean;
+          httpStatus?: number;
+          error?: string;
+        };
+      } = {};
       try {
         data = await res.json();
       } catch {
@@ -265,10 +275,23 @@ export default function SubmitPage() {
       }
 
       if (res.ok) {
+        const n8n = data.n8n;
+        let extra = "";
+        if (n8n?.skipped) {
+          extra =
+            " n8n was not called (set N8N_WEBHOOK_URL in env).";
+        } else if (n8n?.ok === false) {
+          extra = ` n8n webhook failed (${n8n.httpStatus ?? "?"}${
+            n8n.error === "fetch_failed" ? ", network" : ""
+          }). Check URL, workflow Active, and Vercel env.`;
+        }
         setBanner({
           type: "success",
           message:
-            "Claim saved. Your VAT sentinel workflow (n8n webhook) receives the same payload for AI review and case creation.",
+            "Claim saved." +
+            (extra
+              ? extra
+              : " VAT sentinel workflow (n8n) was notified."),
           submissionId: data.id,
         });
         setForm(emptyForm());
