@@ -286,9 +286,9 @@ export default function SubmitPage() {
             n8n?: N8nShape;
             error?: string;
           };
-          if (n8nRes.ok && n8nJson.n8n) {
+          if (n8nJson.n8n) {
             n8n = n8nJson.n8n;
-          } else {
+          } else if (!n8nRes.ok) {
             n8n = {
               skipped: false,
               ok: false,

@@ -248,7 +248,7 @@ export default function EvaluatorDashboardPage() {
         if (!n8nRes.ok) {
           setReviewNotice({
             type: "warn",
-            text: `Decision saved in Supabase. n8n notify failed: ${n8nJson.error ?? n8nRes.status}.`,
+            text: `Decision saved in Supabase. n8n notify failed: ${n8nJson.n8nReviewError ?? n8nJson.error ?? n8nRes.status}.`,
           });
           return;
         }

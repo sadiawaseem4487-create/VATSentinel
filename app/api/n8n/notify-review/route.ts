@@ -75,10 +75,19 @@ export async function POST(req: Request) {
     reviewNotes,
   });
 
-  return NextResponse.json({
-    ok: true,
-    n8nReviewNotified: n8n.skipped ? false : Boolean(n8n.notified),
-    n8nReviewSkipped: n8n.skipped,
-    ...(n8n.error ? { n8nReviewError: n8n.error } : {}),
-  });
+  const n8nReviewNotified = n8n.skipped ? false : Boolean(n8n.notified);
+  const n8nReviewSkipped = n8n.skipped;
+  const n8nReviewError = n8n.error;
+  const upstreamFailed =
+    !n8n.skipped && !n8n.notified;
+
+  return NextResponse.json(
+    {
+      ok: !upstreamFailed,
+      n8nReviewNotified,
+      n8nReviewSkipped,
+      ...(n8nReviewError ? { n8nReviewError } : {}),
+    },
+    { status: upstreamFailed ? 502 : 200 }
+  );
 }

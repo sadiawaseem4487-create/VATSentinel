@@ -48,5 +48,10 @@ export async function POST(req: Request) {
   }
 
   const n8n = await notifyN8nSubmitForRow(data as Record<string, unknown>);
-  return NextResponse.json({ ok: true, n8n });
+  // Upstream n8n failure must not be HTTP 200 — otherwise Vercel logs look “green” while workflows never ran.
+  const upstreamFailed = !n8n.skipped && n8n.ok !== true;
+  return NextResponse.json(
+    { ok: !upstreamFailed, n8n },
+    { status: upstreamFailed ? 502 : 200 }
+  );
 }
