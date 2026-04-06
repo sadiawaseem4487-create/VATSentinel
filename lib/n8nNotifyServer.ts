@@ -10,6 +10,8 @@ export type N8nSubmitNotify = {
   skipped: boolean;
   /** Set when skipped — helps distinguish missing Vercel env vs invalid URL. */
   skipReason?: "env_unset" | "env_invalid";
+  /** API route may set this when using after() — not returned from notifyN8nSubmitForRow. */
+  queued?: boolean;
   ok?: boolean;
   httpStatus?: number;
   error?: "fetch_failed" | "timeout";

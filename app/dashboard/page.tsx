@@ -230,6 +230,7 @@ export default function EvaluatorDashboardPage() {
 
       let n8nJson: {
         n8nReviewNotified?: boolean;
+        n8nReviewQueued?: boolean;
         n8nReviewSkipped?: boolean;
         n8nReviewSkipReason?: "env_unset" | "env_invalid";
         n8nReviewError?: string;
@@ -261,7 +262,12 @@ export default function EvaluatorDashboardPage() {
         return;
       }
 
-      if (n8nJson.n8nReviewNotified) {
+      if (n8nJson.n8nReviewQueued) {
+        setReviewNotice({
+          type: "ok",
+          text: "Decision saved. n8n review webhook was queued in the background — check n8n → Executions; Vercel logs show [n8n notify-review] after(): lines.",
+        });
+      } else if (n8nJson.n8nReviewNotified) {
         setReviewNotice({
           type: "ok",
           text: "Decision saved. The n8n review webhook (review-case) returned OK.",

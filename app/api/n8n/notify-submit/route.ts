@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { notifyN8nSubmitForRow } from "@/lib/n8nNotifyServer";
-import { getSupabaseServerClient } from "@/lib/env.server";
+import { getN8nSubmitWebhookUrl, getSupabaseServerClient } from "@/lib/env.server";
 import { supabaseMisconfiguredResponse } from "@/lib/supabaseConfigError";
 
 /** Isolated from /api/submit so the browser triggers n8n after a successful save (separate invocation). */
@@ -47,11 +47,42 @@ export async function POST(req: Request) {
     );
   }
 
-  const n8n = await notifyN8nSubmitForRow(data as Record<string, unknown>);
-  // Upstream n8n failure must not be HTTP 200 — otherwise Vercel logs look “green” while workflows never ran.
-  const upstreamFailed = !n8n.skipped && n8n.ok !== true;
-  return NextResponse.json(
-    { ok: !upstreamFailed, n8n },
-    { status: upstreamFailed ? 502 : 200 }
+  const row = data as Record<string, unknown>;
+
+  if (!getN8nSubmitWebhookUrl()) {
+    const n8n = await notifyN8nSubmitForRow(row);
+    const upstreamFailed = !n8n.skipped && n8n.ok !== true;
+    return NextResponse.json(
+      { ok: !upstreamFailed, n8n },
+      { status: upstreamFailed ? 502 : 200 }
+    );
+  }
+
+  console.log(
+    "[n8n notify-submit] webhook queued via after(); response returns immediately — see logs for POST result"
   );
+
+  after(() => {
+    void notifyN8nSubmitForRow(row)
+      .then((n8n) => {
+        if (n8n.skipped) {
+          console.warn("[n8n notify-submit] after(): skipped", n8n.skipReason);
+        } else if (n8n.ok === false) {
+          console.error("[n8n notify-submit] after(): upstream failed", {
+            httpStatus: n8n.httpStatus,
+            error: n8n.error,
+          });
+        } else {
+          console.log("[n8n notify-submit] after(): OK", n8n.httpStatus);
+        }
+      })
+      .catch((err) => {
+        console.error("[n8n notify-submit] after(): exception", err);
+      });
+  });
+
+  return NextResponse.json({
+    ok: true,
+    n8n: { skipped: false, queued: true },
+  });
 }
