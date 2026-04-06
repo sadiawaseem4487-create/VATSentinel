@@ -1,4 +1,8 @@
 import { NextResponse } from "next/server";
+import {
+  getN8nReviewWebhookUrl,
+  getN8nSubmitWebhookUrl,
+} from "@/lib/env.server";
 
 /**
  * No secrets. Use to verify env is visible to the server (local + Vercel).
@@ -17,6 +21,14 @@ export async function GET() {
     k.toUpperCase().includes("SUPABASE")
   );
 
+  const n8nRelatedEnvKeys = Object.keys(process.env).filter((k) =>
+    k.toUpperCase().includes("N8N")
+  );
+
+  const rawSubmit = process.env.N8N_WEBHOOK_URL?.trim();
+  const cleanedSubmit = getN8nSubmitWebhookUrl();
+  const cleanedReview = getN8nReviewWebhookUrl();
+
   const ok = Boolean(url && serviceRole);
 
   return NextResponse.json({
@@ -27,6 +39,14 @@ export async function GET() {
     vercelEnv: process.env.VERCEL_ENV ?? null,
     /** Variable names only — empty array means Vercel did not inject any SUPABASE_* keys. */
     supabaseRelatedEnvKeys,
+    n8nRelatedEnvKeys,
+    n8nSubmitWebhookConfigured: Boolean(cleanedSubmit),
+    n8nReviewWebhookConfigured: Boolean(cleanedReview),
+    /**
+     * True if N8N_WEBHOOK_URL is set in env but was rejected (placeholder text,
+     * missing https://, extra quotes, etc.). Fix the value and redeploy.
+     */
+    n8nSubmitWebhookUrlRejected: Boolean(rawSubmit && !cleanedSubmit),
     ...(ok
       ? {}
       : {

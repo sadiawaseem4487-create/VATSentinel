@@ -281,9 +281,13 @@ export default function SubmitPage() {
           extra =
             " n8n was not called (set N8N_WEBHOOK_URL in env).";
         } else if (n8n?.ok === false) {
-          extra = ` n8n webhook failed (${n8n.httpStatus ?? "?"}${
-            n8n.error === "fetch_failed" ? ", network" : ""
-          }). Check URL, workflow Active, and Vercel env.`;
+          const reason =
+            n8n.error === "timeout"
+              ? "timeout (workflow may be slow; on Vercel Hobby ~10s limit — use “Respond immediately” in n8n or shorten the chain)"
+              : n8n.error === "fetch_failed"
+                ? "network"
+                : "HTTP error";
+          extra = ` n8n webhook failed (${n8n.httpStatus ?? "?"}, ${reason}). Check URL, workflow Active, and env.`;
         }
         setBanner({
           type: "success",

@@ -35,12 +35,40 @@ export function getSupabaseServerClient(): SupabaseClient {
   return supabaseServer;
 }
 
+/** Strip quotes and reject placeholder URLs from .env.example copy-paste mistakes. */
+function cleanWebhookUrl(raw: string | undefined): string | undefined {
+  if (!raw) return undefined;
+  let s = raw.trim();
+  if (
+    (s.startsWith('"') && s.endsWith('"')) ||
+    (s.startsWith("'") && s.endsWith("'"))
+  ) {
+    s = s.slice(1, -1).trim();
+  }
+  const lower = s.toLowerCase();
+  if (
+    lower.includes("your_instance") ||
+    lower.includes("your-instance") ||
+    lower.includes("example.com")
+  ) {
+    return undefined;
+  }
+  if (
+    !s.startsWith("https://") &&
+    !s.startsWith("http://localhost") &&
+    !s.startsWith("http://127.0.0.1")
+  ) {
+    return undefined;
+  }
+  return s;
+}
+
 export function getN8nSubmitWebhookUrl(): string | undefined {
-  return process.env.N8N_WEBHOOK_URL?.trim() || undefined;
+  return cleanWebhookUrl(process.env.N8N_WEBHOOK_URL);
 }
 
 export function getN8nReviewWebhookUrl(): string | undefined {
-  return process.env.N8N_REVIEW_WEBHOOK_URL?.trim() || undefined;
+  return cleanWebhookUrl(process.env.N8N_REVIEW_WEBHOOK_URL);
 }
 
 export function getN8nReviewDefaultEmail(): string | undefined {

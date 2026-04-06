@@ -5,6 +5,9 @@ import {
 } from "@/lib/env.server";
 import { supabaseMisconfiguredResponse } from "@/lib/supabaseConfigError";
 
+/** Vercel Hobby ~10s function limit — keep webhook wait below that after DB work. */
+export const maxDuration = 60;
+
 type Body = {
   company_name?: string;
   registration_number?: string;
@@ -95,7 +98,7 @@ export async function POST(req: Request) {
       skipped: boolean;
       ok?: boolean;
       httpStatus?: number;
-      error?: "fetch_failed";
+      error?: "fetch_failed" | "timeout";
     };
     let n8nNotify: N8nNotify = { skipped: true };
 
@@ -112,10 +115,19 @@ export async function POST(req: Request) {
           status: data.status,
           submission: data,
         };
+        const webhookTimeoutMs = Math.min(
+          Math.max(Number(process.env.N8N_WEBHOOK_TIMEOUT_MS) || 8000, 3000),
+          55000
+        );
         const webhookRes = await fetch(webhookUrl, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "User-Agent": "VAT-Sentinel/1.0 (submit)",
+          },
           body: JSON.stringify(webhookPayload),
+          signal: AbortSignal.timeout(webhookTimeoutMs),
         });
         const webhookText = await webhookRes.text();
         if (!webhookRes.ok) {
@@ -139,7 +151,15 @@ export async function POST(req: Request) {
         }
       } catch (webhookError) {
         console.error("n8n webhook failed:", webhookError);
-        n8nNotify = { skipped: false, ok: false, error: "fetch_failed" };
+        const isTimeout =
+          webhookError instanceof Error &&
+          (webhookError.name === "TimeoutError" ||
+            webhookError.name === "AbortError");
+        n8nNotify = {
+          skipped: false,
+          ok: false,
+          error: isTimeout ? "timeout" : "fetch_failed",
+        };
       }
     } else {
       console.warn(
