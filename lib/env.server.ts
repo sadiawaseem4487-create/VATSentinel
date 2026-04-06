@@ -9,14 +9,25 @@ let supabaseServer: SupabaseClient | null = null;
  * Supabase client with service role — use only in API routes / server code.
  * Same code path for local (.env.local) and Vercel (project env vars).
  */
+/** Server-only URL: prefer public URL, then `SUPABASE_URL` (common in Supabase snippets). */
+function getSupabaseProjectUrl(): string | undefined {
+  const a = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const b = process.env.SUPABASE_URL?.trim();
+  return a || b;
+}
+
+function getSupabaseServiceRole(): string | undefined {
+  return process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+}
+
 export function getSupabaseServerClient(): SupabaseClient {
   if (supabaseServer) return supabaseServer;
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  const url = getSupabaseProjectUrl();
+  const key = getSupabaseServiceRole();
   if (!url || !key) {
     throw new Error(
-      "Missing Supabase configuration. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (see .env.example)."
+      "Missing Supabase configuration. Set NEXT_PUBLIC_SUPABASE_URL (or SUPABASE_URL) and SUPABASE_SERVICE_ROLE_KEY (see .env.example)."
     );
   }
 
