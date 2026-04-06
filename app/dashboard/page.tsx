@@ -117,6 +117,7 @@ export default function EvaluatorDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [fetchErrorHint, setFetchErrorHint] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "open" | "approved" | "rejected">(
     "all"
   );
@@ -137,16 +138,19 @@ export default function EvaluatorDashboardPage() {
     if (mode === "initial") setLoading(true);
     if (mode === "manual") setRefreshing(true);
     setFetchError(null);
+    setFetchErrorHint(null);
 
     try {
       const res = await fetch("/api/submissions", { cache: "no-store" });
       const json = (await res.json()) as {
         submissions?: SubmissionRow[];
         error?: string;
+        hint?: string;
       };
 
       if (!res.ok) {
         setFetchError(json.error || "Could not load submissions.");
+        setFetchErrorHint(json.hint ?? null);
         return;
       }
 
@@ -418,7 +422,12 @@ export default function EvaluatorDashboardPage() {
             className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900"
             role="alert"
           >
-            {fetchError}
+            <p className="font-medium">{fetchError}</p>
+            {fetchErrorHint ? (
+              <p className="mt-2 text-xs leading-relaxed text-red-800/95">
+                {fetchErrorHint}
+              </p>
+            ) : null}
           </div>
         )}
 

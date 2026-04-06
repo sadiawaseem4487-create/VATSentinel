@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabaseServerClient } from "@/lib/env.server";
+import { supabaseMisconfiguredResponse } from "@/lib/supabaseConfigError";
 
 export async function GET() {
   let supabase;
@@ -7,10 +8,7 @@ export async function GET() {
     supabase = getSupabaseServerClient();
   } catch (e) {
     console.error(e);
-    return NextResponse.json(
-      { error: "Server is not configured (Supabase)." },
-      { status: 503 }
-    );
+    return supabaseMisconfiguredResponse();
   }
 
   try {

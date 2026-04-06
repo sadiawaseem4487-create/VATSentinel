@@ -3,6 +3,7 @@ import {
   getN8nSubmitWebhookUrl,
   getSupabaseServerClient,
 } from "@/lib/env.server";
+import { supabaseMisconfiguredResponse } from "@/lib/supabaseConfigError";
 
 type Body = {
   company_name?: string;
@@ -36,10 +37,7 @@ export async function POST(req: Request) {
     supabase = getSupabaseServerClient();
   } catch (e) {
     console.error(e);
-    return NextResponse.json(
-      { error: "Server is not configured (Supabase)." },
-      { status: 503 }
-    );
+    return supabaseMisconfiguredResponse();
   }
 
   try {

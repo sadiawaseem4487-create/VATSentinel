@@ -14,10 +14,29 @@ The Next.js app lives at the **repository root** (no subfolder) so **Vercel** ca
 
 ## Run locally
 
+**Supabase is required** for submit, dashboard, and chat. Put **`.env.local` in the repository root** (next to `package.json`). If you still have an old copy under `fraud-frontend/`, run:
+
+```bash
+cp fraud-frontend/.env.local .env.local
+```
+
+Otherwise:
+
 ```bash
 cp .env.example .env.local
-# Edit .env.local with your Supabase, OpenRouter, and n8n webhook URLs
+```
 
+Fill in from [Supabase](https://supabase.com/dashboard) → your project → **Project Settings → API**:
+
+| Variable | Where to find it |
+|----------|------------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | **Project URL** |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | **anon** `public` key |
+| `SUPABASE_SERVICE_ROLE_KEY` | **service_role** key (keep secret; server-only) |
+
+Then add OpenRouter (`OPENAI_API_KEY`) and n8n URLs as in `.env.example`. **Restart** the dev server after editing `.env.local`.
+
+```bash
 npm install
 npm run dev
 ```
@@ -33,8 +52,9 @@ Open **http://localhost:3947** (dev server port is set in `package.json`).
 
 1. Import this repo in [Vercel](https://vercel.com/new).
 2. Leave **Root Directory** empty (or `.`) — the app is at the repo root.
-3. Add **Environment Variables** from `.env.example` (Production, and Preview if needed).
-4. Deploy. The app calls **Supabase**, **OpenRouter** (via `OPENAI_API_KEY`), and **n8n Cloud** webhooks from the server only.
+3. **Settings → Environment Variables:** add the **same keys** as in `.env.local` — at minimum `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`. Missing Supabase keys cause **“Server is not configured (Supabase)”** on the dashboard and APIs.
+4. **Redeploy** after saving variables.
+5. The app calls **Supabase**, **OpenRouter** (via `OPENAI_API_KEY`), and **n8n Cloud** webhooks from the server only.
 
 ## Requirements
 

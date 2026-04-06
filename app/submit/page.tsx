@@ -251,7 +251,8 @@ export default function SubmitPage() {
         }),
       });
 
-      let data: { error?: string; id?: string; ok?: boolean } = {};
+      let data: { error?: string; hint?: string; id?: string; ok?: boolean } =
+        {};
       try {
         data = await res.json();
       } catch {
@@ -273,9 +274,12 @@ export default function SubmitPage() {
         setForm(emptyForm());
         setFieldErrors({});
       } else {
+        const msg = [data.error || "Submission failed.", data.hint]
+          .filter(Boolean)
+          .join(" ");
         setBanner({
           type: "error",
-          message: data.error || "Submission failed.",
+          message: msg,
         });
       }
     } catch {

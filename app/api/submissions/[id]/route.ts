@@ -4,6 +4,7 @@ import {
   getN8nReviewWebhookUrl,
   getSupabaseServerClient,
 } from "@/lib/env.server";
+import { supabaseMisconfiguredResponse } from "@/lib/supabaseConfigError";
 
 const ALLOWED = new Set(["pending", "approved", "rejected"]);
 
@@ -29,10 +30,7 @@ export async function PATCH(
     supabase = getSupabaseServerClient();
   } catch (e) {
     console.error(e);
-    return NextResponse.json(
-      { error: "Server is not configured (Supabase)." },
-      { status: 503 }
-    );
+    return supabaseMisconfiguredResponse();
   }
 
   try {

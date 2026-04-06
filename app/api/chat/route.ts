@@ -2,6 +2,7 @@ import {
   getOpenRouterClient,
   getSupabaseServerClient,
 } from "@/lib/env.server";
+import { supabaseMisconfiguredResponse } from "@/lib/supabaseConfigError";
 import {
   retrieveRagContext,
   type RagScope,
@@ -19,10 +20,7 @@ export async function POST(req: Request) {
     supabase = getSupabaseServerClient();
   } catch (e) {
     console.error(e);
-    return Response.json(
-      { error: "Server is not configured (Supabase)." },
-      { status: 503 }
-    );
+    return supabaseMisconfiguredResponse();
   }
 
   try {
