@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Legacy folder after hoisting app to repo root (local only)
+    "fraud-frontend/**",
   ]),
 ]);
 
