@@ -25,7 +25,9 @@ export async function GET() {
     k.toUpperCase().includes("N8N")
   );
 
-  const rawSubmit = process.env.N8N_WEBHOOK_URL?.trim();
+  const rawSubmit =
+    process.env.N8N_WEBHOOK_URL?.trim() ||
+    process.env.N8N_VAT_Claim_URL?.trim();
   const cleanedSubmit = getN8nSubmitWebhookUrl();
   const cleanedReview = getN8nReviewWebhookUrl();
 
@@ -43,8 +45,8 @@ export async function GET() {
     n8nSubmitWebhookConfigured: Boolean(cleanedSubmit),
     n8nReviewWebhookConfigured: Boolean(cleanedReview),
     /**
-     * True if N8N_WEBHOOK_URL is set in env but was rejected (placeholder text,
-     * missing https://, extra quotes, etc.). Fix the value and redeploy.
+     * True if N8N_WEBHOOK_URL or N8N_VAT_Claim_URL is set but was rejected
+     * (placeholder, missing https://, extra quotes, etc.).
      */
     n8nSubmitWebhookUrlRejected: Boolean(rawSubmit && !cleanedSubmit),
     /**
@@ -55,8 +57,8 @@ export async function GET() {
     ...(!cleanedSubmit
       ? {
           n8nSubmitWebhookHint: rawSubmit
-            ? "N8N_WEBHOOK_URL is set but rejected — use https:// production URL from n8n (not webhook-test), no quotes or placeholders."
-            : "N8N_WEBHOOK_URL is unset for this deployment — in Vercel → Settings → Environment Variables, add it and tick Preview and Production (match vercelEnv above), then Redeploy.",
+            ? "N8N_WEBHOOK_URL / N8N_VAT_Claim_URL is set but rejected — use https:// production URL from n8n (not webhook-test), no quotes or placeholders."
+            : "N8N submit webhook URL is unset — set N8N_WEBHOOK_URL or N8N_VAT_Claim_URL in Vercel (Preview + Production), then Redeploy.",
         }
       : {}),
     ...(ok

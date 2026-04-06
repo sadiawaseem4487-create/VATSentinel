@@ -63,12 +63,26 @@ function cleanWebhookUrl(raw: string | undefined): string | undefined {
   return s;
 }
 
+/**
+ * Submit-chain webhook. Primary: `N8N_WEBHOOK_URL`.
+ * Alias: `N8N_VAT_Claim_URL` (same value — some teams use this name in Vercel).
+ */
 export function getN8nSubmitWebhookUrl(): string | undefined {
-  return cleanWebhookUrl(process.env.N8N_WEBHOOK_URL);
+  return (
+    cleanWebhookUrl(process.env.N8N_WEBHOOK_URL) ||
+    cleanWebhookUrl(process.env.N8N_VAT_Claim_URL)
+  );
 }
 
+/**
+ * Review-chain webhook. Primary: `N8N_REVIEW_WEBHOOK_URL`.
+ * Alias: `N8N_REVIEW_Case_WEBHOOK_URL`.
+ */
 export function getN8nReviewWebhookUrl(): string | undefined {
-  return cleanWebhookUrl(process.env.N8N_REVIEW_WEBHOOK_URL);
+  return (
+    cleanWebhookUrl(process.env.N8N_REVIEW_WEBHOOK_URL) ||
+    cleanWebhookUrl(process.env.N8N_REVIEW_Case_WEBHOOK_URL)
+  );
 }
 
 export function getN8nReviewDefaultEmail(): string | undefined {

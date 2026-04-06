@@ -304,8 +304,8 @@ export default function SubmitPage() {
         if (n8n?.skipped) {
           extra =
             n8n.skipReason === "env_invalid"
-              ? " n8n was not called: N8N_WEBHOOK_URL is invalid in Vercel (use https:// production URL, no quotes)."
-              : " n8n was not called: N8N_WEBHOOK_URL is missing for this deployment — set it under Preview and Production in Vercel.";
+              ? " n8n was not called: webhook URL env is invalid (use https:// production URL, no quotes)."
+              : " n8n was not called: set N8N_WEBHOOK_URL or N8N_VAT_Claim_URL under Preview and Production in Vercel.";
         } else if (n8n?.ok === false) {
           const reason =
             n8n.error === "timeout"

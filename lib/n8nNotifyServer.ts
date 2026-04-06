@@ -18,15 +18,17 @@ export type N8nSubmitNotify = {
 export async function notifyN8nSubmitForRow(
   data: Record<string, unknown>
 ): Promise<N8nSubmitNotify> {
-  const rawSubmit = process.env.N8N_WEBHOOK_URL?.trim();
+  const rawSubmit =
+    process.env.N8N_WEBHOOK_URL?.trim() ||
+    process.env.N8N_VAT_Claim_URL?.trim();
   const webhookUrl = getN8nSubmitWebhookUrl();
   if (!webhookUrl) {
     const skipReason = !rawSubmit ? "env_unset" : "env_invalid";
     console.warn(
       "[n8n notify-submit] skipped:",
       skipReason === "env_unset"
-        ? "N8N_WEBHOOK_URL is unset — add it for this Vercel environment (Preview and Production are separate)."
-        : "N8N_WEBHOOK_URL is set but rejected (must be https:// for cloud, not a placeholder, no wrapping quotes)."
+        ? "Set N8N_WEBHOOK_URL or N8N_VAT_Claim_URL for this Vercel environment (Preview and Production are separate)."
+        : "N8N webhook URL env is set but rejected (must be https:// for cloud, not a placeholder, no wrapping quotes)."
     );
     return { skipped: true, skipReason };
   }
@@ -115,15 +117,17 @@ export async function notifyN8nReviewDecision(params: {
   reviewerEmail: string;
   reviewNotes: string;
 }): Promise<N8nReviewNotify> {
-  const rawReview = process.env.N8N_REVIEW_WEBHOOK_URL?.trim();
+  const rawReview =
+    process.env.N8N_REVIEW_WEBHOOK_URL?.trim() ||
+    process.env.N8N_REVIEW_Case_WEBHOOK_URL?.trim();
   const reviewWebhookUrl = getN8nReviewWebhookUrl();
   if (!reviewWebhookUrl) {
     const skipReason = !rawReview ? "env_unset" : "env_invalid";
     console.warn(
       "[n8n notify-review] skipped:",
       skipReason === "env_unset"
-        ? "N8N_REVIEW_WEBHOOK_URL is unset — add it for this Vercel environment (Preview vs Production)."
-        : "N8N_REVIEW_WEBHOOK_URL is set but rejected (https://, not a placeholder)."
+        ? "Set N8N_REVIEW_WEBHOOK_URL or N8N_REVIEW_Case_WEBHOOK_URL for this Vercel environment (Preview vs Production)."
+        : "N8N review webhook URL env is set but rejected (https://, not a placeholder)."
     );
     return { skipped: true, skipReason };
   }
