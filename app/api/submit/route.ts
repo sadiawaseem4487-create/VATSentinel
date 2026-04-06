@@ -1,12 +1,6 @@
 import { NextResponse } from "next/server";
-import {
-  getN8nSubmitWebhookUrl,
-  getSupabaseServerClient,
-} from "@/lib/env.server";
+import { getSupabaseServerClient } from "@/lib/env.server";
 import { supabaseMisconfiguredResponse } from "@/lib/supabaseConfigError";
-
-/** Vercel Hobby ~10s function limit — keep webhook wait below that after DB work. */
-export const maxDuration = 60;
 
 type Body = {
   company_name?: string;
@@ -80,7 +74,6 @@ export async function POST(req: Request) {
       status: "pending" as const,
     };
 
-    // Your Supabase project uses public.submissions (same VAT fields + optional ai_* columns).
     const { data, error } = await supabase
       .from("submissions")
       .insert(row)
@@ -92,82 +85,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // n8n: POST full saved row (plus event metadata). Top-level keys stay for older workflows.
-    const webhookUrl = getN8nSubmitWebhookUrl();
-    type N8nNotify = {
-      skipped: boolean;
-      ok?: boolean;
-      httpStatus?: number;
-      error?: "fetch_failed" | "timeout";
-    };
-    let n8nNotify: N8nNotify = { skipped: true };
-
-    if (webhookUrl) {
-      try {
-        const webhookPayload = {
-          event: "vat_claim_submitted",
-          source: "fraud-frontend",
-          submissionId: data.id,
-          company_name: data.company_name,
-          vat_number: data.vat_number,
-          claim_type: data.claim_type,
-          total_claim_amount: data.total_claim_amount,
-          status: data.status,
-          submission: data,
-        };
-        const webhookTimeoutMs = Math.min(
-          Math.max(Number(process.env.N8N_WEBHOOK_TIMEOUT_MS) || 8000, 3000),
-          55000
-        );
-        const webhookRes = await fetch(webhookUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            "User-Agent": "VAT-Sentinel/1.0 (submit)",
-          },
-          body: JSON.stringify(webhookPayload),
-          signal: AbortSignal.timeout(webhookTimeoutMs),
-        });
-        const webhookText = await webhookRes.text();
-        if (!webhookRes.ok) {
-          console.error(
-            "n8n webhook non-OK:",
-            webhookRes.status,
-            webhookText.slice(0, 500)
-          );
-          n8nNotify = {
-            skipped: false,
-            ok: false,
-            httpStatus: webhookRes.status,
-          };
-        } else {
-          console.log("n8n webhook OK:", webhookRes.status);
-          n8nNotify = {
-            skipped: false,
-            ok: true,
-            httpStatus: webhookRes.status,
-          };
-        }
-      } catch (webhookError) {
-        console.error("n8n webhook failed:", webhookError);
-        const isTimeout =
-          webhookError instanceof Error &&
-          (webhookError.name === "TimeoutError" ||
-            webhookError.name === "AbortError");
-        n8nNotify = {
-          skipped: false,
-          ok: false,
-          error: isTimeout ? "timeout" : "fetch_failed",
-        };
-      }
-    } else {
-      console.warn(
-        "N8N_WEBHOOK_URL is not set; VAT claim saved to Supabase but n8n was not notified."
-      );
-    }
-
-    return NextResponse.json({ ok: true, id: data.id, n8n: n8nNotify });
+    return NextResponse.json({ ok: true, id: data.id });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });

@@ -203,21 +203,19 @@ export default function EvaluatorDashboardPage() {
 
   const updateStatus = async (id: string, newStatus: "approved" | "rejected") => {
     setUpdatingId(id);
+    const reviewNotes = `Evaluator dashboard: ${newStatus}`;
     try {
       const res = await fetch(`/api/submissions/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           status: newStatus,
-          review_notes: `Evaluator dashboard: ${newStatus}`,
+          review_notes: reviewNotes,
         }),
       });
       const json = (await res.json()) as {
         submission?: SubmissionRow;
         error?: string;
-        n8nReviewNotified?: boolean;
-        n8nReviewSkipped?: boolean;
-        n8nReviewError?: string;
       };
       if (!res.ok) {
         setFetchError(json.error || "Update failed.");
@@ -229,29 +227,66 @@ export default function EvaluatorDashboardPage() {
           prev.map((r) => (r.id === id ? { ...r, ...json.submission } : r))
         );
       }
-      if (json.n8nReviewNotified) {
+
+      let n8nJson: {
+        n8nReviewNotified?: boolean;
+        n8nReviewSkipped?: boolean;
+        n8nReviewError?: string;
+        error?: string;
+      } = {};
+      try {
+        const n8nRes = await fetch("/api/n8n/notify-review", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            submissionId: id,
+            status: newStatus,
+            review_notes: reviewNotes,
+          }),
+        });
+        n8nJson = (await n8nRes.json().catch(() => ({}))) as typeof n8nJson;
+        if (!n8nRes.ok) {
+          setReviewNotice({
+            type: "warn",
+            text: `Decision saved in Supabase. n8n notify failed: ${n8nJson.error ?? n8nRes.status}.`,
+          });
+          return;
+        }
+      } catch {
+        setReviewNotice({
+          type: "warn",
+          text: "Decision saved in Supabase. n8n notify request failed (network).",
+        });
+        return;
+      }
+
+      if (n8nJson.n8nReviewNotified) {
         setReviewNotice({
           type: "ok",
           text: "Decision saved. The n8n review webhook (review-case) returned OK.",
         });
-      } else if (json.n8nReviewSkipped) {
+      } else if (n8nJson.n8nReviewSkipped) {
         setReviewNotice({
           type: "warn",
-          text: "Decision saved in Supabase only. Set N8N_REVIEW_WEBHOOK_URL in .env.local and restart the dev server to notify n8n.",
+          text: "Decision saved in Supabase only. Set N8N_REVIEW_WEBHOOK_URL in Vercel env (or .env.local locally) to notify n8n.",
         });
-      } else if (json.n8nReviewError) {
+      } else if (n8nJson.n8nReviewError) {
         setReviewNotice({
           type: "warn",
-          text: `Decision saved in Supabase. n8n webhook failed: ${json.n8nReviewError}`,
+          text: `Decision saved in Supabase. n8n webhook failed: ${n8nJson.n8nReviewError}`,
         });
       } else {
-        setReviewNotice(null);
+        setReviewNotice({
+          type: "warn",
+          text: "Decision saved in Supabase. n8n notify returned an unexpected response.",
+        });
       }
     } catch {
       setFetchError("Network error while updating.");
       setReviewNotice(null);
+    } finally {
+      setUpdatingId(null);
     }
-    setUpdatingId(null);
   };
 
   const filteredRows = rows.filter((row) => {

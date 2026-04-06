@@ -256,12 +256,6 @@ export default function SubmitPage() {
         hint?: string;
         id?: string;
         ok?: boolean;
-        n8n?: {
-          skipped?: boolean;
-          ok?: boolean;
-          httpStatus?: number;
-          error?: string;
-        };
       } = {};
       try {
         data = await res.json();
@@ -274,8 +268,37 @@ export default function SubmitPage() {
         return;
       }
 
-      if (res.ok) {
-        const n8n = data.n8n;
+      if (res.ok && data.id) {
+        type N8nShape = {
+          skipped?: boolean;
+          ok?: boolean;
+          httpStatus?: number;
+          error?: string;
+        };
+        let n8n: N8nShape | undefined;
+        try {
+          const n8nRes = await fetch("/api/n8n/notify-submit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ submissionId: data.id }),
+          });
+          const n8nJson = (await n8nRes.json().catch(() => ({}))) as {
+            n8n?: N8nShape;
+            error?: string;
+          };
+          if (n8nRes.ok && n8nJson.n8n) {
+            n8n = n8nJson.n8n;
+          } else {
+            n8n = {
+              skipped: false,
+              ok: false,
+              httpStatus: n8nRes.status,
+            };
+          }
+        } catch {
+          n8n = { skipped: false, ok: false, error: "fetch_failed" };
+        }
+
         let extra = "";
         if (n8n?.skipped) {
           extra =
