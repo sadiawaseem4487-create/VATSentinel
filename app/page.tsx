@@ -1,5 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { AgentScanHero } from "@/components/AgentScanHero";
+import { HomeSplashGate } from "@/components/HomeSplashGate";
+
+export const metadata: Metadata = {
+  title: "Home",
+  description:
+    "Pilot surface for VAT reclaim intake, evaluator workspace, and screening assistant.",
+};
 
 function IconDocument({ className }: { className?: string }) {
   return (
@@ -41,6 +49,7 @@ function IconChart({ className }: { className?: string }) {
 
 export default function HomePage() {
   return (
+    <HomeSplashGate>
     <main className="min-h-[calc(100dvh-8rem)] bg-gradient-to-b from-slate-50 via-white to-emerald-50/40">
       <div className="mx-auto max-w-5xl px-6 py-14 sm:py-20">
         <div className="text-center">
@@ -132,5 +141,6 @@ export default function HomePage() {
         </p>
       </div>
     </main>
+    </HomeSplashGate>
   );
 }

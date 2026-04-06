@@ -48,7 +48,7 @@ export function AppHeader() {
             Finland pilot
           </span>
           <nav
-            className="flex flex-wrap items-center justify-end gap-0.5 text-sm font-medium"
+            className="-mx-1 flex max-w-[min(100vw,28rem)] flex-nowrap items-center justify-end gap-0.5 overflow-x-auto px-1 pb-0.5 text-sm font-medium sm:max-w-none sm:flex-wrap sm:overflow-visible sm:pb-0"
             aria-label="Main"
           >
             {NAV.map(({ href, label }) => {

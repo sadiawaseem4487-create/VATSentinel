@@ -19,14 +19,23 @@ export async function GET() {
 
     if (error) {
       console.error("submissions list error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json(
+        {
+          error: error.message,
+          hint: "Verify Supabase env on this deployment (see GET /api/health).",
+        },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ submissions: data ?? [] });
   } catch (e) {
     console.error(e);
     return NextResponse.json(
-      { error: "Failed to load submissions" },
+      {
+        error: "Failed to load submissions",
+        hint: "Check server logs and GET /api/health.",
+      },
       { status: 500 }
     );
   }

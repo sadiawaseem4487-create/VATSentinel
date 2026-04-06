@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -15,6 +15,46 @@ type ChatMessage = {
 };
 
 type Scope = "overview" | "case";
+
+const SUGGESTED_CHIPS: Record<
+  Scope,
+  { label: string; prompt: string }[]
+> = {
+  overview: [
+    {
+      label: "Portfolio totals",
+      prompt:
+        "Using SECTION A (full database aggregates), how many submissions are in the database, what is the status breakdown, and what are the sums of claim amounts by currency?",
+    },
+    {
+      label: "Recent sample",
+      prompt:
+        "Summarize the most recent submissions in the sample (SECTION B) and call out anything that looks elevated risk.",
+    },
+    {
+      label: "Exposure",
+      prompt:
+        "What total claim exposure appears in the aggregates, and how is it distributed by status?",
+    },
+  ],
+  case: [
+    {
+      label: "Amount & period",
+      prompt:
+        "What are the claim amount, currency, and claim period for this case?",
+    },
+    {
+      label: "Contacts",
+      prompt:
+        "Who is the contact person, and what email or phone is on file?",
+    },
+    {
+      label: "Risk",
+      prompt:
+        "What risk score or risk band is recorded for this submission, if any?",
+    },
+  ],
+};
 
 function formatRetrievalNote(note: string): string {
   const map: Record<string, string> = {
@@ -107,6 +147,13 @@ function ChatPageContent() {
       cancelled = true;
     };
   }, []);
+
+  const lastAssistantText = useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].role === "assistant") return messages[i].text;
+    }
+    return null;
+  }, [messages]);
 
   const sendMessage = async () => {
     if (!message.trim()) return;
@@ -421,6 +468,33 @@ function ChatPageContent() {
           </div>
 
           <div className="border-t border-slate-100 bg-white px-4 py-4 sm:px-6">
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+              Suggested prompts
+            </p>
+            <div className="mb-3 flex flex-wrap gap-2">
+              {SUGGESTED_CHIPS[scope].map(({ label, prompt }) => (
+                <button
+                  key={label}
+                  type="button"
+                  disabled={loading || assistantConfigured === false}
+                  onClick={() => setMessage(prompt)}
+                  className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-950 disabled:opacity-50"
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            {lastAssistantText && (
+              <div className="mb-3 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => void navigator.clipboard.writeText(lastAssistantText)}
+                  className="text-xs font-medium text-emerald-800 underline decoration-emerald-400/70 underline-offset-2 hover:text-emerald-950"
+                >
+                  Copy last reply
+                </button>
+              </div>
+            )}
             <label htmlFor="chat-input" className="sr-only">
               Your message
             </label>

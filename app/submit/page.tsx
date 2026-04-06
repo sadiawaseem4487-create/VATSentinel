@@ -403,8 +403,25 @@ export default function SubmitPage() {
             >
               <p>{banner.message}</p>
               {banner.submissionId && (
-                <p className="mt-2 font-mono text-xs text-slate-700">
-                  Submission ID: {banner.submissionId}
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <p className="font-mono text-xs text-slate-700">
+                    Submission ID: {banner.submissionId}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void navigator.clipboard.writeText(banner.submissionId!);
+                    }}
+                    className="rounded-lg border border-emerald-300/80 bg-white px-2.5 py-1 text-xs font-semibold text-emerald-900 shadow-sm transition hover:bg-emerald-50"
+                  >
+                    Copy ID
+                  </button>
+                </div>
+              )}
+              {banner.type === "success" && (
+                <p className="mt-2 text-xs text-slate-600">
+                  Your claim is stored. Screening runs in the background — check
+                  n8n executions or the evaluator queue.
                 </p>
               )}
             </div>

@@ -415,7 +415,11 @@ export default function EvaluatorDashboardPage() {
             </p>
             {lastSynced && (
               <p className="mt-2 text-xs text-slate-500">
-                Last synced: {lastSynced.toLocaleTimeString()}
+                Last synced:{" "}
+                {lastSynced.toLocaleString(undefined, {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })}
                 {refreshing ? " · Updating…" : ""}
               </p>
             )}
@@ -498,7 +502,50 @@ export default function EvaluatorDashboardPage() {
         )}
 
         {loading ? (
-          <p className="py-16 text-center text-slate-600">Loading submissions…</p>
+          <div className="space-y-8 py-2" aria-busy="true" aria-label="Loading workspace">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div
+                  key={i}
+                  className="h-24 animate-pulse rounded-xl border border-slate-100 bg-slate-100/80"
+                />
+              ))}
+            </div>
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="h-72 animate-pulse rounded-xl border border-slate-100 bg-slate-100/60"
+                />
+              ))}
+            </div>
+            <div className="h-10 max-w-xl animate-pulse rounded-xl bg-slate-100" />
+            <div className="h-48 animate-pulse rounded-xl border border-slate-100 bg-slate-50" />
+          </div>
+        ) : fetchError ? null : rows.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/80 px-6 py-16 text-center">
+            <p className="text-lg font-semibold text-slate-900">No submissions yet</p>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-600">
+              When claims are submitted through intake, they appear here for review.
+              Use <strong className="font-medium text-slate-800">Refresh</strong>{" "}
+              after a test submission.
+            </p>
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <Link
+                href="/submit"
+                className="inline-flex rounded-xl bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800"
+              >
+                Submit a claim
+              </Link>
+              <button
+                type="button"
+                onClick={() => fetchSubmissions("manual")}
+                className="inline-flex rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50"
+              >
+                Refresh
+              </button>
+            </div>
+          </div>
         ) : (
           <>
             <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
