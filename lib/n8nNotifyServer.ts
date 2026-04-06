@@ -8,6 +8,8 @@ import {
 
 export type N8nSubmitNotify = {
   skipped: boolean;
+  /** Set when skipped — helps distinguish missing Vercel env vs invalid URL. */
+  skipReason?: "env_unset" | "env_invalid";
   ok?: boolean;
   httpStatus?: number;
   error?: "fetch_failed" | "timeout";
@@ -16,9 +18,26 @@ export type N8nSubmitNotify = {
 export async function notifyN8nSubmitForRow(
   data: Record<string, unknown>
 ): Promise<N8nSubmitNotify> {
+  const rawSubmit = process.env.N8N_WEBHOOK_URL?.trim();
   const webhookUrl = getN8nSubmitWebhookUrl();
   if (!webhookUrl) {
-    return { skipped: true };
+    const skipReason = !rawSubmit ? "env_unset" : "env_invalid";
+    console.warn(
+      "[n8n notify-submit] skipped:",
+      skipReason === "env_unset"
+        ? "N8N_WEBHOOK_URL is unset — add it for this Vercel environment (Preview and Production are separate)."
+        : "N8N_WEBHOOK_URL is set but rejected (must be https:// for cloud, not a placeholder, no wrapping quotes)."
+    );
+    return { skipped: true, skipReason };
+  }
+
+  try {
+    console.log(
+      "[n8n notify-submit] POST",
+      new URL(webhookUrl).hostname
+    );
+  } catch {
+    console.log("[n8n notify-submit] POST (outbound to n8n webhook)");
   }
 
   const webhookPayload = {
@@ -84,6 +103,7 @@ export async function notifyN8nSubmitForRow(
 
 export type N8nReviewNotify = {
   skipped: boolean;
+  skipReason?: "env_unset" | "env_invalid";
   notified?: boolean;
   error?: string;
 };
@@ -95,9 +115,26 @@ export async function notifyN8nReviewDecision(params: {
   reviewerEmail: string;
   reviewNotes: string;
 }): Promise<N8nReviewNotify> {
+  const rawReview = process.env.N8N_REVIEW_WEBHOOK_URL?.trim();
   const reviewWebhookUrl = getN8nReviewWebhookUrl();
   if (!reviewWebhookUrl) {
-    return { skipped: true };
+    const skipReason = !rawReview ? "env_unset" : "env_invalid";
+    console.warn(
+      "[n8n notify-review] skipped:",
+      skipReason === "env_unset"
+        ? "N8N_REVIEW_WEBHOOK_URL is unset — add it for this Vercel environment (Preview vs Production)."
+        : "N8N_REVIEW_WEBHOOK_URL is set but rejected (https://, not a placeholder)."
+    );
+    return { skipped: true, skipReason };
+  }
+
+  try {
+    console.log(
+      "[n8n notify-review] POST",
+      new URL(reviewWebhookUrl).hostname
+    );
+  } catch {
+    console.log("[n8n notify-review] POST (outbound to n8n webhook)");
   }
 
   const { id, status, data, reviewerEmail, reviewNotes } = params;

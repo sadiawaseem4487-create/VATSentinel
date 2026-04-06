@@ -86,6 +86,9 @@ export async function POST(req: Request) {
       ok: !upstreamFailed,
       n8nReviewNotified,
       n8nReviewSkipped,
+      ...(n8n.skipped && n8n.skipReason
+        ? { n8nReviewSkipReason: n8n.skipReason }
+        : {}),
       ...(n8nReviewError ? { n8nReviewError } : {}),
     },
     { status: upstreamFailed ? 502 : 200 }

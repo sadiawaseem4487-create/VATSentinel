@@ -231,6 +231,7 @@ export default function EvaluatorDashboardPage() {
       let n8nJson: {
         n8nReviewNotified?: boolean;
         n8nReviewSkipped?: boolean;
+        n8nReviewSkipReason?: "env_unset" | "env_invalid";
         n8nReviewError?: string;
         error?: string;
       } = {};
@@ -266,9 +267,13 @@ export default function EvaluatorDashboardPage() {
           text: "Decision saved. The n8n review webhook (review-case) returned OK.",
         });
       } else if (n8nJson.n8nReviewSkipped) {
+        const hint =
+          n8nJson.n8nReviewSkipReason === "env_invalid"
+            ? "N8N_REVIEW_WEBHOOK_URL is invalid (https:// production URL, no placeholder)."
+            : "N8N_REVIEW_WEBHOOK_URL is missing for this deployment — set Preview and Production in Vercel.";
         setReviewNotice({
           type: "warn",
-          text: "Decision saved in Supabase only. Set N8N_REVIEW_WEBHOOK_URL in Vercel env (or .env.local locally) to notify n8n.",
+          text: `Decision saved in Supabase only. ${hint}`,
         });
       } else if (n8nJson.n8nReviewError) {
         setReviewNotice({
