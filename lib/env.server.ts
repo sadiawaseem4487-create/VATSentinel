@@ -92,11 +92,21 @@ export function getN8nReviewDefaultEmail(): string | undefined {
 const DEFAULT_OPENROUTER_BASE = "https://openrouter.ai/api/v1";
 
 /**
- * OpenRouter-compatible client (OPENAI_API_KEY holds the OpenRouter key in this project).
- * Returns null if the key is missing so callers can return a clear 503.
+ * OpenRouter API key: `OPENAI_API_KEY` (name kept for SDK compatibility) or alias `OPENROUTER_API_KEY`.
+ */
+export function getOpenRouterApiKey(): string | undefined {
+  return (
+    process.env.OPENAI_API_KEY?.trim() ||
+    process.env.OPENROUTER_API_KEY?.trim() ||
+    undefined
+  );
+}
+
+/**
+ * OpenRouter-compatible client. Returns null if the key is missing (503 from /api/chat).
  */
 export function getOpenRouterClient(): OpenAI | null {
-  const apiKey = process.env.OPENAI_API_KEY?.trim();
+  const apiKey = getOpenRouterApiKey();
   if (!apiKey) return null;
   const baseURL =
     process.env.OPENROUTER_BASE_URL?.trim() || DEFAULT_OPENROUTER_BASE;

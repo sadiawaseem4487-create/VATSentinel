@@ -63,6 +63,26 @@ function ChatPageContent() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [caseHint, setCaseHint] = useState<string | null>(null);
+  /** null = health check pending */
+  const [assistantConfigured, setAssistantConfigured] = useState<
+    boolean | null
+  >(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/health", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((j: { chatAssistantConfigured?: boolean }) => {
+        if (!cancelled)
+          setAssistantConfigured(Boolean(j.chatAssistantConfigured));
+      })
+      .catch(() => {
+        if (!cancelled) setAssistantConfigured(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const sendMessage = async () => {
     if (!message.trim()) return;
@@ -106,19 +126,22 @@ function ChatPageContent() {
       const data = (await res.json()) as {
         reply?: string;
         error?: string;
+        hint?: string;
         retrievedCount?: number;
         scope?: string;
         retrievalNote?: string | null;
       };
 
       if (!res.ok) {
+        const errText =
+          data.error ||
+          "Something went wrong while processing your message. Please try again.";
+        const fullText = data.hint ? `${errText}\n\n${data.hint}` : errText;
         setMessages((prev) => [
           ...prev,
           {
             role: "assistant",
-            text:
-              data.error ||
-              "Something went wrong while processing your message. Please try again.",
+            text: fullText,
             meta: {
               retrievedCount: 0,
               scope,
@@ -177,6 +200,38 @@ function ChatPageContent() {
             between portfolio overview and a single case.
           </p>
         </header>
+
+        {assistantConfigured === false ? (
+          <div
+            className="mb-6 rounded-xl border border-amber-200 bg-amber-50/95 px-4 py-3 text-sm text-amber-950 shadow-sm"
+            role="status"
+          >
+            <p className="font-semibold">Assistant needs an API key</p>
+            <p className="mt-1.5 leading-relaxed text-amber-950/95">
+              Add{" "}
+              <code className="rounded border border-amber-300/80 bg-white/80 px-1.5 py-0.5 font-mono text-xs">
+                OPENAI_API_KEY
+              </code>{" "}
+              (paste your{" "}
+              <a
+                href="https://openrouter.ai/keys"
+                className="font-medium text-amber-900 underline decoration-amber-400/80 underline-offset-2 hover:text-amber-950"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                OpenRouter
+              </a>{" "}
+              secret) or{" "}
+              <code className="rounded border border-amber-300/80 bg-white/80 px-1.5 py-0.5 font-mono text-xs">
+                OPENROUTER_API_KEY
+              </code>{" "}
+              in Vercel → Environment Variables for <strong>Preview</strong> and{" "}
+              <strong>Production</strong>, then Redeploy. Check{" "}
+              <code className="font-mono text-xs">/api/health</code> →{" "}
+              <code className="font-mono text-xs">chatAssistantConfigured</code>.
+            </p>
+          </div>
+        ) : null}
 
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg shadow-slate-200/60 ring-1 ring-slate-950/[0.03]">
           <div className="border-b border-slate-100 bg-slate-50/80 px-5 py-4 sm:px-6">
@@ -359,17 +414,23 @@ function ChatPageContent() {
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
-                    if (!loading) sendMessage();
+                    if (!loading && assistantConfigured !== false)
+                      sendMessage();
                   }
                 }}
+                disabled={assistantConfigured === false}
               />
               <button
                 type="button"
                 onClick={sendMessage}
-                disabled={loading}
+                disabled={loading || assistantConfigured === false}
                 className="shrink-0 rounded-xl bg-emerald-700 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800 disabled:opacity-50"
               >
-                {loading ? "Please wait…" : "Send"}
+                {loading
+                  ? "Please wait…"
+                  : assistantConfigured === false
+                    ? "Configure API key"
+                    : "Send"}
               </button>
             </div>
             <p className="mt-2 text-[11px] text-slate-500">

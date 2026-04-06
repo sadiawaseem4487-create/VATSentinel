@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import {
   getN8nReviewWebhookUrl,
   getN8nSubmitWebhookUrl,
+  getOpenRouterApiKey,
 } from "@/lib/env.server";
 
 /**
@@ -25,6 +26,13 @@ export async function GET() {
     k.toUpperCase().includes("N8N")
   );
 
+  const openAiRelatedEnvKeys = Object.keys(process.env).filter((k) => {
+    const u = k.toUpperCase();
+    return u.includes("OPENAI") || u.includes("OPENROUTER");
+  });
+
+  const chatAssistantConfigured = Boolean(getOpenRouterApiKey());
+
   const rawSubmit =
     process.env.N8N_WEBHOOK_URL?.trim() ||
     process.env.N8N_VAT_Claim_URL?.trim();
@@ -44,6 +52,15 @@ export async function GET() {
     n8nRelatedEnvKeys,
     n8nSubmitWebhookConfigured: Boolean(cleanedSubmit),
     n8nReviewWebhookConfigured: Boolean(cleanedReview),
+    /** OpenRouter key for /api/chat (OPENAI_API_KEY or OPENROUTER_API_KEY). */
+    chatAssistantConfigured,
+    openAiRelatedEnvKeys,
+    ...(!chatAssistantConfigured
+      ? {
+          chatAssistantHint:
+            "Add OPENAI_API_KEY (OpenRouter secret) or OPENROUTER_API_KEY in Vercel for Preview + Production, then Redeploy. See openrouter.ai/keys.",
+        }
+      : {}),
     /**
      * True if N8N_WEBHOOK_URL or N8N_VAT_Claim_URL is set but was rejected
      * (placeholder, missing https://, extra quotes, etc.).

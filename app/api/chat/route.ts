@@ -64,8 +64,11 @@ export async function POST(req: Request) {
     if (!openai) {
       return Response.json(
         {
+          code: "OPENAI_NOT_CONFIGURED" as const,
           error:
-            "The screening assistant is not configured. Add OPENAI_API_KEY (OpenRouter) to the server environment.",
+            "The screening assistant needs an LLM API key on the server (OpenRouter).",
+          hint:
+            "Vercel → Settings → Environment Variables: add OPENAI_API_KEY with your OpenRouter key (or OPENROUTER_API_KEY). Enable Preview and Production, then Redeploy. Get a key at openrouter.ai/keys.",
         },
         { status: 503 }
       );
