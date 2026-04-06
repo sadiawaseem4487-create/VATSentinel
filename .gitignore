@@ -1,0 +1,16 @@
+# Dependencies & OS
+node_modules/
+.DS_Store
+
+# fraud-frontend (Next.js)
+fraud-frontend/node_modules/
+fraud-frontend/.next/
+fraud-frontend/out/
+fraud-frontend/build/
+fraud-frontend/coverage/
+fraud-frontend/.vercel
+fraud-frontend/*.tsbuildinfo
+
+# Env files — never commit secrets (keep .env.example)
+fraud-frontend/.env*
+!fraud-frontend/.env.example

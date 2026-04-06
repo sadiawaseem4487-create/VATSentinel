@@ -1,0 +1,9 @@
+{
+  "name": "fuaud-detection-monorepo",
+  "private": true,
+  "description": "Root package so Tailwind/PostCSS resolve when the parent folder is inferred as workspace root",
+  "dependencies": {
+    "@tailwindcss/postcss": "^4",
+    "tailwindcss": "^4"
+  }
+}

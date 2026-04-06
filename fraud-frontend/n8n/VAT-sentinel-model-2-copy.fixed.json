@@ -1,0 +1,1209 @@
+{
+  "name": "VAT sentinel model 2 copy",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "submissions",
+        "limit": 1,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $json.body.submissionId || $json.submissionId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        -112
+      ],
+      "id": "567649ce-cfca-4e4f-8b44-9f015af76030",
+      "name": "Get many rows",
+      "credentials": {
+        "supabaseApi": {
+          "id": "CYMTvCg4ek1QUfWc",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "400211f8-08c6-451d-8c5b-70f83d5c66b4",
+              "name": "submission_id",
+              "value": "={{$json.id}}",
+              "type": "string"
+            },
+            {
+              "id": "f1e37571-8be7-448c-8366-700a0da75634",
+              "name": "company_name",
+              "value": "={{$json.company_name}}",
+              "type": "string"
+            },
+            {
+              "id": "687e06af-9edf-43ec-af32-c48677eeabda",
+              "name": "registration_number",
+              "value": "={{$json.registration_number}}",
+              "type": "string"
+            },
+            {
+              "id": "89e1847c-0df7-4849-9229-705c6d5856de",
+              "name": "vat_number",
+              "value": "={{$json.vat_number}}",
+              "type": "string"
+            },
+            {
+              "id": "d6f85e91-e274-44cc-a06e-a9c1afca10b8",
+              "name": "country",
+              "value": "={{$json.country}}",
+              "type": "string"
+            },
+            {
+              "id": "841bff9b-576b-4393-9d33-e9ab560316d6",
+              "name": "address",
+              "value": "={{$json.address}}",
+              "type": "string"
+            },
+            {
+              "id": "aef0fa88-804f-47e9-b8f5-d6106f6be7a2",
+              "name": "contact_person",
+              "value": "={{$json.contact_person}}",
+              "type": "string"
+            },
+            {
+              "id": "fc99f0c5-2f61-4a3d-8938-41bf1f5947ba",
+              "name": "contact_email",
+              "value": "={{$json.contact_email}}",
+              "type": "string"
+            },
+            {
+              "id": "a5fe8b28-6065-48b8-a6ad-87e8948057b5",
+              "name": "contact_phone",
+              "value": "={{$json.contact_phone}}",
+              "type": "string"
+            },
+            {
+              "id": "631de6c7-b764-431a-90ee-98d90cb874e6",
+              "name": "claim_period_start",
+              "value": "={{$json.claim_period_start}}",
+              "type": "string"
+            },
+            {
+              "id": "e2136f90-cf8a-445d-8467-453f0056f85c",
+              "name": "claim_period_end",
+              "value": "={{$json.claim_period_end}}",
+              "type": "string"
+            },
+            {
+              "id": "f6ecc84d-d302-4773-995b-ea6e977c5d6d",
+              "name": "claim_type",
+              "value": "={{$json.claim_type}}",
+              "type": "string"
+            },
+            {
+              "id": "7192da68-d307-4c7f-a60a-6417ae6f503d",
+              "name": "total_claim_amount",
+              "value": "={{$json.total_claim_amount}}",
+              "type": "string"
+            },
+            {
+              "id": "920b7994-12f4-4fc0-b1a6-d6762bfde88d",
+              "name": "currency",
+              "value": "={{$json.currency}}",
+              "type": "string"
+            },
+            {
+              "id": "7e6cc73d-825d-4c66-a000-6f553c2524ea",
+              "name": "invoice_count",
+              "value": "={{$json.invoice_count}}",
+              "type": "string"
+            },
+            {
+              "id": "36c685d3-16f1-45b9-9d64-edbaad5e38c1",
+              "name": "claim_description",
+              "value": "={{$json.claim_description}}",
+              "type": "string"
+            },
+            {
+              "id": "e01084b8-b3af-4f6b-a36a-577ecddac7ff",
+              "name": "bank_name",
+              "value": "={{$json.bank_name}}",
+              "type": "string"
+            },
+            {
+              "id": "2fe35c82-b5c5-4374-8374-a308c97eae79",
+              "name": "account_holder_name",
+              "value": "={{$json.account_holder_name}}",
+              "type": "string"
+            },
+            {
+              "id": "8bcec26c-aa17-4b5d-a6e0-6c92bad1656b",
+              "name": "iban",
+              "value": "={{$json.iban}}",
+              "type": "string"
+            },
+            {
+              "id": "f4e9d566-18d0-4552-a37e-6f71ae29c6f6",
+              "name": "swift_code",
+              "value": "={{$json.swift_code}}",
+              "type": "string"
+            },
+            {
+              "id": "556852e5-cc9f-4185-9a04-5798eced76f1",
+              "name": "invoice_references",
+              "value": "={{$json.invoice_references}}",
+              "type": "string"
+            },
+            {
+              "id": "958adf7d-b0e6-4b34-996e-3ec6e4af7dbb",
+              "name": "transaction_references",
+              "value": "={{$json.transaction_references}}",
+              "type": "string"
+            },
+            {
+              "id": "ae3e9170-405d-44c3-88c1-8d5759794070",
+              "name": "additional_notes",
+              "value": "={{$json.additional_notes}}",
+              "type": "string"
+            },
+            {
+              "id": "7392962a-b9db-408c-b3b0-7d0c102f384b",
+              "name": "review_mode",
+              "value": "ai_first",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        32,
+        -112
+      ],
+      "id": "4338a4d8-da5e-42b7-a995-34001e4232ca",
+      "name": "prepare_ai_case"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze this VAT claim submission.\n\nSubmission ID: {{$json.submission_id}}\nCompany Name: {{$json.company_name}}\nRegistration Number: {{$json.registration_number}}\nVAT Number: {{$json.vat_number}}\nCountry: {{$json.country}}\nAddress: {{$json.address}}\n\nContact Person: {{$json.contact_person}}\nContact Email: {{$json.contact_email}}\nContact Phone: {{$json.contact_phone}}\n\nClaim Period Start: {{$json.claim_period_start}}\nClaim Period End: {{$json.claim_period_end}}\nClaim Type: {{$json.claim_type}}\nTotal Claim Amount: {{$json.total_claim_amount}}\nCurrency: {{$json.currency}}\nInvoice Count: {{$json.invoice_count}}\nClaim Description: {{$json.claim_description}}\n\nBank Name: {{$json.bank_name}}\nAccount Holder Name: {{$json.account_holder_name}}\nIBAN: {{$json.iban}}\nSWIFT Code: {{$json.swift_code}}\n\nInvoice References: {{$json.invoice_references}}\nTransaction References: {{$json.transaction_references}}\nAdditional Notes: {{$json.additional_notes}}\n\nPlease assess the fraud/review risk of this VAT claim according to the policy.\nRemember: do not approve or reject the claim.\nOnly classify the risk, explain why, and say what a human should check next.",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a VAT fraud screening assistant for a claim review workflow.\n\nYour task is to assess the fraud or review risk of a VAT claim submission.\n\nIMPORTANT RULES:\n- You do NOT approve, reject, or block claims.\n- You only assess risk and support human reviewers.\n- Final business decisions must always be made by a human.\n- Base your assessment only on the claim data provided.\n- Do not invent missing facts.\n- If data is missing or unclear, treat that as uncertainty and explain it.\n\nRISK OBJECTIVE:\nClassify the submission into exactly one of these risk bands:\n- HIGH\n- MEDIUM\n- LOW\n\nSCORING RULE:\nReturn a numeric score from 0 to 100.\n- 0 to 34 = LOW\n- 35 to 69 = MEDIUM\n- 70 to 100 = HIGH\n\nHOW TO EVALUATE:\nFocus on these risk areas:\n\n1. Company identity consistency\n- Does company name, registration number, VAT number, country, and contact information appear internally consistent?\n- Are there suspicious mismatches or missing critical identifiers?\n\n2. Claim amount plausibility\n- Is the total claim amount unusually high relative to the information provided?\n- Does the amount make sense given invoice count and claim description?\n\n3. Invoice and claim detail quality\n- Are invoice references present and plausible?\n- Is the claim period reasonable?\n- Is the claim description too vague, incomplete, or inconsistent?\n\n4. Bank and payment consistency\n- Do bank name, account holder name, IBAN, and SWIFT details appear plausible?\n- Are there signs that payment details may not match the claimant identity?\n\n5. Completeness and credibility\n- Are important fields missing?\n- Are there contradictions or suspicious omissions?\n- Is the declaration accepted?\n\nRISK INTERPRETATION:\n- HIGH: strong suspicious indicators, major inconsistencies, or several medium issues combined\n- MEDIUM: some warning signs, incomplete or unclear data, needs human review\n- LOW: data appears reasonably consistent with no strong fraud indicators from the provided information\n\nRECOMMENDED ACTION RULES:\n- HIGH -> recommended_action = \"human_review_immediate\"\n- MEDIUM -> recommended_action = \"review\"\n- LOW -> recommended_action = \"monitor\"\n\nHUMAN REVIEW RULES:\n- HIGH -> requires_human_review = true\n- MEDIUM -> requires_human_review = true\n- LOW -> requires_human_review = false\n\nOUTPUT REQUIREMENTS:\nReturn structured output only with these fields:\n- risk_band\n- score\n- decision\n- recommended_action\n- requires_human_review\n- reasoning\n- investigation_focus\n\nFIELD RULES:\n- risk_band must be exactly one of: HIGH, MEDIUM, LOW\n- score must be a number from 0 to 100\n- decision must be exactly one of: HIGH RISK, MEDIUM RISK, LOW RISK\n- recommended_action must be exactly one of: human_review_immediate, review, monitor\n- requires_human_review must be a boolean\n- reasoning must be specific, concise, and based only on the provided data\n- investigation_focus must be a short practical next step for a human reviewer\n\nDo not include any extra fields.\nDo not include any text outside the structured output.",
+          "maxIterations": 500
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        288,
+        -112
+      ],
+      "id": "5c70845c-6126-4310-a7bc-2ec93af7b921",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "openai/gpt-4",
+          "mode": "list",
+          "cachedResultName": "openai/gpt-4"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        32,
+        128
+      ],
+      "id": "f83632eb-6de1-4cde-8882-6e4d5564fa2e",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "0BAgORTbUwIlTkef",
+          "name": "OpenAi account 16"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a7c99a04-7b3d-487b-998d-53898f366555",
+              "name": "submission_id",
+              "value": "={{$node[\"prepare_ai_case\"].json[\"submission_id\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "a5c8985f-1d1d-4fb9-93b5-d551a621ebae",
+              "name": "risk_band",
+              "value": "={{$json.output.risk_band}}",
+              "type": "string"
+            },
+            {
+              "id": "3f4eaba6-c016-4fa2-9598-6b371d3bd3c7",
+              "name": "score",
+              "value": "={{$json.output.score}}",
+              "type": "number"
+            },
+            {
+              "id": "998d6c7f-6ed0-4870-94e1-f2428ce9b9da",
+              "name": "decision",
+              "value": "={{$json.output.decision}}",
+              "type": "string"
+            },
+            {
+              "id": "010fa686-b1c1-4bc6-a250-794c9507beae",
+              "name": "recommended_action",
+              "value": "={{$json.output.recommended_action}}",
+              "type": "string"
+            },
+            {
+              "id": "bbb0a3b5-638a-450d-833b-416e8e55f5c8",
+              "name": "requires_human_review",
+              "value": "={{$json.output.requires_human_review}}",
+              "type": "boolean"
+            },
+            {
+              "id": "f9751437-ae7f-4469-8e54-545903c251aa",
+              "name": "reasoning",
+              "value": "={{$json.output.reasoning}}",
+              "type": "string"
+            },
+            {
+              "id": "346fe842-40fa-4937-a844-007e697e36f9",
+              "name": "investigation_focus",
+              "value": "={{$json.output.investigation_focus}}",
+              "type": "string"
+            },
+            {
+              "id": "b8036cd9-a012-4f34-9c8d-1e01c76ec65f",
+              "name": "review_mode",
+              "value": "={{$node[\"prepare_ai_case\"].json[\"review_mode\"]}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        656,
+        -112
+      ],
+      "id": "ddc12ea6-f790-432b-b70b-f688e8c3ae5c",
+      "name": "Parse AI Output"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"risk_band\": \"HIGH\",\n  \"score\": 82,\n  \"decision\": \"HIGH RISK\",\n  \"recommended_action\": \"human_review_immediate\",\n  \"requires_human_review\": true,\n  \"reasoning\": \"The claim shows inconsistencies between company identity and bank details, and the claim amount is unusually high relative to invoice count.\",\n  \"investigation_focus\": \"Verify company registration, bank account ownership, and invoice authenticity.\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        176
+      ],
+      "id": "3b7bd956-0fc1-433f-8af9-d9276db96913",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3f313bc-7795-4b62-86eb-461c690afb5f",
+              "name": "risk_band",
+              "value": "={{$json.risk_band}}",
+              "type": "string"
+            },
+            {
+              "id": "9b389db4-ccbb-49b7-b24e-4046ca31174e",
+              "name": "recommended_action",
+              "value": "={{$json.risk_band === \"HIGH\" ? \"human_review_immediate\" : $json.risk_band === \"MEDIUM\" ? \"review\" : \"monitor\"}}",
+              "type": "string"
+            },
+            {
+              "id": "5ea3bf54-afb5-4e04-8396-94de01d6df0e",
+              "name": "requires_human_review",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "a3376815-ddf9-4a6b-a318-480530651e29",
+              "name": "case_status",
+              "value": "={{$json.risk_band === \"HIGH\" ? \"pending_human_review\" : $json.risk_band === \"MEDIUM\" ? \"pending_human_review\" : \"screened_low_risk\"}}",
+              "type": "string"
+            },
+            {
+              "id": "47ac849e-bcd4-49fb-a5c6-cdd045140246",
+              "name": "assigned_queue",
+              "value": "={{$json.risk_band === \"HIGH\" ? \"fraud_analyst_queue\" : $json.risk_band === \"MEDIUM\" ? \"review_queue\" : \"low_risk_queue\"}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        -112
+      ],
+      "id": "9f342651-6bff-461d-8b28-807286e02294",
+      "name": "Apply Risk Policy"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "287cd5ca-a482-4e7e-80d8-c33f83e277f7",
+              "name": "submission_id",
+              "value": "={{$node[\"Parse AI Output\"].json.submission_id}}",
+              "type": "string"
+            },
+            {
+              "id": "90697a47-a581-45bc-b2cd-e3245747efc3",
+              "name": "score",
+              "value": "={{$node[\"Parse AI Output\"].json.score}}",
+              "type": "string"
+            },
+            {
+              "id": "c72ea969-1eaf-413b-8c56-ef9a7c183286",
+              "name": "decision",
+              "value": "={{$node[\"Parse AI Output\"].json.decision}}",
+              "type": "string"
+            },
+            {
+              "id": "d3b3aaaf-3886-4f62-b480-f530cd8a342a",
+              "name": "risk_band",
+              "value": "={{$node[\"Apply Risk Policy\"].json.risk_band}}",
+              "type": "string"
+            },
+            {
+              "id": "e7dac2ad-13be-4db8-a66c-dbf637b57023",
+              "name": "recommended_action",
+              "value": "={{$node[\"Apply Risk Policy\"].json.recommended_action}}",
+              "type": "string"
+            },
+            {
+              "id": "1852943b-f9f9-46d7-87ba-56a81a673694",
+              "name": "requires_human_review",
+              "value": "={{$node[\"Apply Risk Policy\"].json.requires_human_review}}",
+              "type": "boolean"
+            },
+            {
+              "id": "c5c62fe5-e91e-41f8-bffa-2fb6f42a38dc",
+              "name": "reasoning",
+              "value": "={{$node[\"Parse AI Output\"].json.reasoning}}",
+              "type": "string"
+            },
+            {
+              "id": "12dba765-47eb-4987-906c-17e847af3f9f",
+              "name": "investigation_focus",
+              "value": "={{$node[\"Parse AI Output\"].json.investigation_focus}}",
+              "type": "string"
+            },
+            {
+              "id": "482bbe87-d5ab-450d-95d6-c17f08130d80",
+              "name": "case_status",
+              "value": "={{$node[\"Apply Risk Policy\"].json.case_status}}",
+              "type": "string"
+            },
+            {
+              "id": "4a68a672-30c2-4258-b22c-2ce2380bcd08",
+              "name": "assigned_queue",
+              "value": "={{$node[\"Apply Risk Policy\"].json.assigned_queue}}",
+              "type": "string"
+            },
+            {
+              "id": "4f6cbfcb-5856-4f4d-b6c3-db6ce60a11b5",
+              "name": "review_mode",
+              "value": "={{$node[\"Parse AI Output\"].json.review_mode}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1072,
+        128
+      ],
+      "id": "0477fc83-cbae-4d90-9fc9-062c34d8fe80",
+      "name": "Final Case Record"
+    },
+    {
+      "parameters": {
+        "tableId": "fraud_workflow_results",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "submission_id",
+              "fieldValue": "={{$json.submission_id}}"
+            },
+            {
+              "fieldId": "score",
+              "fieldValue": "={{$json.score}}"
+            },
+            {
+              "fieldId": "decision",
+              "fieldValue": "={{$json.decision}}"
+            },
+            {
+              "fieldId": "risk_band",
+              "fieldValue": "={{$json.risk_band}}"
+            },
+            {
+              "fieldId": "recommended_action",
+              "fieldValue": "={{$json.recommended_action}}"
+            },
+            {
+              "fieldId": "requires_human_review",
+              "fieldValue": "={{$json.requires_human_review}}"
+            },
+            {
+              "fieldId": "reasoning",
+              "fieldValue": "={{$json.reasoning}}"
+            },
+            {
+              "fieldId": "investigation_focus",
+              "fieldValue": "={{$json.investigation_focus}}"
+            },
+            {
+              "fieldId": "case_status",
+              "fieldValue": "={{$json.case_status}}"
+            },
+            {
+              "fieldId": "assigned_queue",
+              "fieldValue": "={{$json.assigned_queue}}"
+            },
+            {
+              "fieldId": "review_mode",
+              "fieldValue": "={{$json.review_mode}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        128
+      ],
+      "id": "b7a1a291-cdc0-40ce-9157-fd75f2c439e3",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "CYMTvCg4ek1QUfWc",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "sadia.waseem4487@gmail.com",
+        "subject": "=\ud83d\udea8 HIGH RISK VAT CLAIM ALERT | {{$node[\"Final Case Record\"].json.submission_id}} | Score {{$node[\"Final Case Record\"].json.score}}",
+        "message": "=<h2 style=\"color:#dc2626;\">\ud83d\udea8 High Risk VAT Claim Detected</h2>\n\n<p><strong>Submission ID:</strong> {{$node[\"Final Case Record\"].json.submission_id}}</p>\n<p><strong>Risk Score:</strong> {{$node[\"Final Case Record\"].json.score}}</p>\n<p><strong>Decision:</strong> {{$node[\"Final Case Record\"].json.decision}}</p>\n<p><strong>Risk Band:</strong> {{$node[\"Final Case Record\"].json.risk_band}}</p>\n\n<hr>\n\n<h3>AI Reasoning</h3>\n<p>{{$node[\"Final Case Record\"].json.reasoning}}</p>\n\n<h3>Investigation Focus</h3>\n<p>{{$node[\"Final Case Record\"].json.investigation_focus}}</p>\n\n<hr>\n\n<p><strong>Action Required:</strong> Immediate human review</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1920,
+        96
+      ],
+      "id": "4fb52f7f-268d-48bd-a382-8787d063f5a6",
+      "name": "Send a message",
+      "webhookId": "dadea311-893e-433c-9e66-685673442777",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fo8B1xrRduY8EanE",
+          "name": "Gmail account 9"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Fraud Case Review Update",
+        "height": 80
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -976,
+        752
+      ],
+      "typeVersion": 1,
+      "id": "a86bb39a-685a-4155-95eb-c2fb6a6bc092",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -704,
+        720
+      ],
+      "id": "e29c39a2-5e4b-4696-8fea-9ab14d7b1ada",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "961a7f24-2ab3-48dc-b9c7-7cc4fadef484",
+              "name": "case_id",
+              "value": "CASE005",
+              "type": "string"
+            },
+            {
+              "id": "ac9447b6-630f-401e-896f-be450d9a234c",
+              "name": "reviewer_email",
+              "value": "sadia.waseem4487@gmail.com",
+              "type": "string"
+            },
+            {
+              "id": "80250160-7a30-4438-9620-ffe1c4265c14",
+              "name": "review_notes",
+              "value": "Claim amount verified against history. Escalating as suspicious.",
+              "type": "string"
+            },
+            {
+              "id": "a6bcbf39-af94-4b39-a77f-66babe514c06",
+              "name": "final_outcome",
+              "value": "confirmed_fraud",
+              "type": "string"
+            },
+            {
+              "id": "d94914af-1309-4438-b22d-6e4f3e369e87",
+              "name": "new_status",
+              "value": "blocked",
+              "type": "string"
+            },
+            {
+              "id": "f85cbbf8-cfbb-4d02-ba30-a710c84fb20f",
+              "name": "actor_type",
+              "value": "human_reviewer",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -496,
+        720
+      ],
+      "id": "c012553f-76b2-4016-bcc5-98ed5fbaceb7",
+      "name": "Review Input"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "fraud_workflow_results",
+        "limit": 1,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "case_id",
+              "condition": "eq",
+              "keyValue": "={{$json.case_id}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        720
+      ],
+      "id": "5065f6f5-7d14-4571-a546-4eae5d1ab074",
+      "name": "Fetch Case",
+      "credentials": {
+        "supabaseApi": {
+          "id": "CYMTvCg4ek1QUfWc",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "75af67f3-0c62-4aab-9aa4-0c1ca79b703a",
+              "name": "old_status",
+              "value": "={{$node[\"Fetch Case\"].json.case_status}}",
+              "type": "string"
+            },
+            {
+              "id": "5ae308d9-87a3-472f-8d70-5542d1fa83a1",
+              "name": "case_status",
+              "value": "={{$node[\"Review Input\"].json.new_status}}",
+              "type": "string"
+            },
+            {
+              "id": "cc918f3e-f66a-4226-aa79-8f8f2f2062c4",
+              "name": "reviewer_email",
+              "value": "={{$node[\"Review Input\"].json.reviewer_email}}",
+              "type": "string"
+            },
+            {
+              "id": "3f539d0f-8dc4-421a-9410-1f1d6df4021a",
+              "name": "review_notes",
+              "value": "={{$node[\"Review Input\"].json.review_notes}}",
+              "type": "string"
+            },
+            {
+              "id": "38da2f27-e9d1-4dcb-aebd-8d3ff5482ed1",
+              "name": "final_outcome",
+              "value": "={{$node[\"Review Input\"].json.final_outcome}}",
+              "type": "string"
+            },
+            {
+              "id": "34cf877f-c478-4ffb-a6b9-1ad74a237f99",
+              "name": "reviewed_at",
+              "value": "={{ new Date().toISOString() }}",
+              "type": "string"
+            },
+            {
+              "id": "0fcc4164-043f-48cb-a280-d357009f8724",
+              "name": "updated_at",
+              "value": "={{ new Date().toISOString() }}",
+              "type": "string"
+            },
+            {
+              "id": "5de62dad-083d-446d-9b9f-b3f8f414d89c",
+              "name": "actor_type",
+              "value": "={{$node[\"Review Input\"].json.actor_type}}",
+              "type": "string"
+            },
+            {
+              "id": "b8197b1d-0803-418c-a191-689d49911cc6",
+              "name": "actor_id",
+              "value": "={{$node[\"Review Input\"].json.reviewer_email}}",
+              "type": "string"
+            },
+            {
+              "id": "ab249838-f708-422a-a4ff-8c70024ae710",
+              "name": "case_id",
+              "value": "={{$node[\"Review Input\"].json.case_id}}",
+              "type": "string"
+            },
+            {
+              "id": "33ba882a-0975-426c-ba09-b78c29cfe1c8",
+              "name": "record_id",
+              "value": "={{$node[\"Fetch Case\"].json.id}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -80,
+        720
+      ],
+      "id": "f1c26ca3-170b-411d-aaca-c92692311609",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "fraud_workflow_results",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{$json.record_id}}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "case_status",
+              "fieldValue": "={{$json.case_status}}"
+            },
+            {
+              "fieldId": "reviewer_email",
+              "fieldValue": "={{$json.reviewer_email}}"
+            },
+            {
+              "fieldId": "review_notes",
+              "fieldValue": "={{$json.review_notes}}"
+            },
+            {
+              "fieldId": "final_outcome",
+              "fieldValue": "={{$json.final_outcome}}"
+            },
+            {
+              "fieldId": "reviewed_at",
+              "fieldValue": "={{$json.reviewed_at}}"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{$json.updated_at}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        128,
+        720
+      ],
+      "id": "484d11fb-6540-425f-9660-619678c1e344",
+      "name": "Update Case Record",
+      "credentials": {
+        "supabaseApi": {
+          "id": "CYMTvCg4ek1QUfWc",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "audit_log",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "timestamp",
+              "fieldValue": "={{ new Date().toISOString() }}"
+            },
+            {
+              "fieldId": "actor_type",
+              "fieldValue": "={{$node[\"Edit Fields\"].json.actor_type}}"
+            },
+            {
+              "fieldId": "actor_id",
+              "fieldValue": "={{$node[\"Review Input\"].json.reviewer_email}}"
+            },
+            {
+              "fieldId": "case_id",
+              "fieldValue": "={{$json.case_id}}"
+            },
+            {
+              "fieldId": "action",
+              "fieldValue": "review_completed"
+            },
+            {
+              "fieldId": "before",
+              "fieldValue": "={{ { case_status: $node[\"Edit Fields\"].json.old_status } }}"
+            },
+            {
+              "fieldId": "after",
+              "fieldValue": "={{ {\n  case_status: $json.case_status,\n  final_outcome: $json.final_outcome,\n  reviewed_at: $json.reviewed_at\n} }}"
+            },
+            {
+              "fieldId": "metadata",
+              "fieldValue": "={{ {   reviewer_email: $json.reviewer_email,   review_notes: $json.review_notes,   score: $json.score,   decision: $json.decision,   risk_band: $json.risk_band } }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        336,
+        720
+      ],
+      "id": "02b07b57-36f5-4f46-94fe-8e49bee22a4b",
+      "name": "Write Audit Log",
+      "credentials": {
+        "supabaseApi": {
+          "id": "CYMTvCg4ek1QUfWc",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vat-claim",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -608,
+        -112
+      ],
+      "id": "8f936109-b745-4d33-8c42-8c0de3f88fb7",
+      "name": "Webhook",
+      "webhookId": "ce7f5ffe-7381-4f4b-b12e-0baa78613a61"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1680,
+        544
+      ],
+      "id": "47803dc4-f0ea-4128-b8b1-fd4e9fc26970",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "openai/gpt-4o",
+          "mode": "list",
+          "cachedResultName": "openai/gpt-4o"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        432
+      ],
+      "id": "1438c769-2878-409a-a086-9c7bb373a9ff",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "0BAgORTbUwIlTkef",
+          "name": "OpenAi account 16"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "submissions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{$json.submission_id}}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "={{$json.case_status}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1424,
+        128
+      ],
+      "id": "e6bfa786-1602-49a0-986b-7c90b0096f6f",
+      "name": "Update a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "CYMTvCg4ek1QUfWc",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "21a4210d-8cf0-4a77-bf63-ea37e1f1ecfd",
+              "leftValue": "={{$node[\"Apply Risk Policy\"].json.risk_band}}",
+              "rightValue": "HIGH",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1632,
+        128
+      ],
+      "id": "283a2e68-b892-4e75-82f5-0936dd823a26",
+      "name": "If"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get many rows": {
+      "main": [
+        [
+          {
+            "node": "prepare_ai_case",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepare_ai_case": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Output": {
+      "main": [
+        [
+          {
+            "node": "Apply Risk Policy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apply Risk Policy": {
+      "main": [
+        [
+          {
+            "node": "Final Case Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final Case Record": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Review Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Review Input": {
+      "main": [
+        [
+          {
+            "node": "Fetch Case",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Case": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Update Case Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Case Record": {
+      "main": [
+        [
+          {
+            "node": "Write Audit Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get many rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "b8f1d9ba-9697-4968-ab31-269df8f1e282",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4784b6630819dc7dc9b11bd92c38955269c9cd3c8cec78f70f71546c7d4973ee"
+  },
+  "id": "OFrQhSUl5ttXy4dr",
+  "tags": []
+}
