@@ -272,8 +272,6 @@ export default function SubmitPage() {
         type N8nShape = {
           skipped?: boolean;
           skipReason?: "env_unset" | "env_invalid";
-          /** Server returned before waiting on n8n (slow workflows OK). */
-          queued?: boolean;
           ok?: boolean;
           httpStatus?: number;
           error?: string;
@@ -308,9 +306,6 @@ export default function SubmitPage() {
             n8n.skipReason === "env_invalid"
               ? " n8n was not called: webhook URL env is invalid (use https:// production URL, no quotes)."
               : " n8n was not called: set N8N_WEBHOOK_URL or N8N_VAT_Claim_URL under Preview and Production in Vercel.";
-        } else if (n8n?.queued) {
-          extra =
-            " VAT sentinel workflow (n8n) was triggered in the background — long runs are fine; confirm in n8n → Executions.";
         } else if (n8n?.ok === false) {
           const reason =
             n8n.error === "timeout"

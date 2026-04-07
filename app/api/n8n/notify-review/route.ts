@@ -1,9 +1,9 @@
-import { NextResponse, after } from "next/server";
+import { NextResponse } from "next/server";
 import {
   notifyN8nReviewDecision,
   resolveReviewerEmail,
 } from "@/lib/n8nNotifyServer";
-import { getN8nReviewWebhookUrl, getSupabaseServerClient } from "@/lib/env.server";
+import { getSupabaseServerClient } from "@/lib/env.server";
 import { supabaseMisconfiguredResponse } from "@/lib/supabaseConfigError";
 
 const ALLOWED = new Set(["pending", "approved", "rejected"]);
@@ -75,51 +75,22 @@ export async function POST(req: Request) {
     reviewNotes,
   };
 
-  if (!getN8nReviewWebhookUrl()) {
-    const n8n = await notifyN8nReviewDecision(payload);
-    const n8nReviewNotified = n8n.skipped ? false : Boolean(n8n.notified);
-    const n8nReviewSkipped = n8n.skipped;
-    const n8nReviewError = n8n.error;
-    const upstreamFailed = !n8n.skipped && !n8n.notified;
+  const n8n = await notifyN8nReviewDecision(payload);
+  const n8nReviewNotified = n8n.skipped ? false : Boolean(n8n.notified);
+  const n8nReviewSkipped = n8n.skipped;
+  const n8nReviewError = n8n.error;
+  const upstreamFailed = !n8n.skipped && !n8n.notified;
 
-    return NextResponse.json(
-      {
-        ok: !upstreamFailed,
-        n8nReviewNotified,
-        n8nReviewSkipped,
-        ...(n8n.skipped && n8n.skipReason
-          ? { n8nReviewSkipReason: n8n.skipReason }
-          : {}),
-        ...(n8nReviewError ? { n8nReviewError } : {}),
-      },
-      { status: upstreamFailed ? 502 : 200 }
-    );
-  }
-
-  console.log(
-    "[n8n notify-review] webhook queued via after(); response returns immediately — see logs for POST result"
+  return NextResponse.json(
+    {
+      ok: !upstreamFailed,
+      n8nReviewNotified,
+      n8nReviewSkipped,
+      ...(n8n.skipped && n8n.skipReason
+        ? { n8nReviewSkipReason: n8n.skipReason }
+        : {}),
+      ...(n8nReviewError ? { n8nReviewError } : {}),
+    },
+    { status: upstreamFailed ? 502 : 200 }
   );
-
-  after(() => {
-    void notifyN8nReviewDecision(payload)
-      .then((n8n) => {
-        if (n8n.skipped) {
-          console.warn("[n8n notify-review] after(): skipped", n8n.skipReason);
-        } else if (!n8n.notified) {
-          console.error("[n8n notify-review] after(): upstream failed", n8n.error);
-        } else {
-          console.log("[n8n notify-review] after(): OK");
-        }
-      })
-      .catch((err) => {
-        console.error("[n8n notify-review] after(): exception", err);
-      });
-  });
-
-  return NextResponse.json({
-    ok: true,
-    n8nReviewNotified: false,
-    n8nReviewQueued: true,
-    n8nReviewSkipped: false,
-  });
 }

@@ -270,7 +270,7 @@ export default function EvaluatorDashboardPage() {
       if (n8nJson.n8nReviewQueued) {
         setReviewNotice({
           type: "ok",
-          text: "Decision saved. n8n review webhook was queued in the background — check n8n → Executions; Vercel logs show [n8n notify-review] after(): lines.",
+          text: "Decision saved. n8n review webhook was accepted (legacy queued response).",
         });
       } else if (n8nJson.n8nReviewNotified) {
         setReviewNotice({
