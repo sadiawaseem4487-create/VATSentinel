@@ -587,37 +587,43 @@
             {
               "id": "961a7f24-2ab3-48dc-b9c7-7cc4fadef484",
               "name": "case_id",
-              "value": "CASE005",
+              "value": "={{ $json.body.submissionId || $json.body.submission_id || $json.body.case_id || $json.submissionId || $json.submission_id || $json.case_id || 'CASE005' }}",
+              "type": "string"
+            },
+            {
+              "id": "subm-lookup-001",
+              "name": "submission_id",
+              "value": "={{ $json.body.submissionId || $json.body.submission_id || $json.body.case_id || $json.submissionId || $json.submission_id || $json.case_id || 'CASE005' }}",
               "type": "string"
             },
             {
               "id": "ac9447b6-630f-401e-896f-be450d9a234c",
               "name": "reviewer_email",
-              "value": "sadia.waseem4487@gmail.com",
+              "value": "={{ $json.body.reviewer_email || $json.reviewer_email || 'sadia.waseem4487@gmail.com' }}",
               "type": "string"
             },
             {
               "id": "80250160-7a30-4438-9620-ffe1c4265c14",
               "name": "review_notes",
-              "value": "Claim amount verified against history. Escalating as suspicious.",
+              "value": "={{ $json.body.review_notes || $json.review_notes || 'Claim amount verified against history. Escalating as suspicious.' }}",
               "type": "string"
             },
             {
               "id": "a6bcbf39-af94-4b39-a77f-66babe514c06",
               "name": "final_outcome",
-              "value": "confirmed_fraud",
+              "value": "={{ $json.body.final_outcome || $json.final_outcome || 'confirmed_fraud' }}",
               "type": "string"
             },
             {
               "id": "d94914af-1309-4438-b22d-6e4f3e369e87",
               "name": "new_status",
-              "value": "blocked",
+              "value": "={{ $json.body.new_status || $json.new_status || 'blocked' }}",
               "type": "string"
             },
             {
               "id": "f85cbbf8-cfbb-4d02-ba30-a710c84fb20f",
               "name": "actor_type",
-              "value": "human_reviewer",
+              "value": "={{ $json.body.actor_type || $json.actor_type || 'human_reviewer' }}",
               "type": "string"
             }
           ]
@@ -642,9 +648,9 @@
         "filters": {
           "conditions": [
             {
-              "keyName": "case_id",
+              "keyName": "submission_id",
               "condition": "eq",
-              "keyValue": "={{$json.case_id}}"
+              "keyValue": "={{$json.submission_id || $json.case_id}}"
             }
           ]
         }

@@ -83,6 +83,11 @@ function isOpenStatus(s: string | null | undefined) {
   return !isApprovedStatus(s) && !isRejectedStatus(s);
 }
 
+/** Approve/Reject already saved — avoid duplicate clicks and confusing “second evaluation”. */
+function isDecisionLocked(s: string | null | undefined) {
+  return isApprovedStatus(s) || isRejectedStatus(s);
+}
+
 function formatMoney(amount: unknown, currency: unknown) {
   if (amount == null || amount === "") return "—";
   const n = Number(amount);
@@ -802,22 +807,30 @@ export default function EvaluatorDashboardPage() {
                             </button>
                           </td>
                           <td className="whitespace-nowrap px-4 py-3 text-right">
-                            <button
-                              type="button"
-                              onClick={() => updateStatus(id, "approved")}
-                              disabled={updatingId === id}
-                              className="mr-2 rounded-lg bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-800 disabled:opacity-50"
-                            >
-                              Approve
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => updateStatus(id, "rejected")}
-                              disabled={updatingId === id}
-                              className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-50"
-                            >
-                              Reject
-                            </button>
+                            {isDecisionLocked(row.status as string) ? (
+                              <span className="text-xs text-slate-500">
+                                Decision recorded
+                              </span>
+                            ) : (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => updateStatus(id, "approved")}
+                                  disabled={updatingId === id}
+                                  className="mr-2 rounded-lg bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-800 disabled:opacity-50"
+                                >
+                                  Approve
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => updateStatus(id, "rejected")}
+                                  disabled={updatingId === id}
+                                  className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+                                >
+                                  Reject
+                                </button>
+                              </>
+                            )}
                           </td>
                         </tr>
                         {open && (

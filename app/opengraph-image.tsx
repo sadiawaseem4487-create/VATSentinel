@@ -9,7 +9,7 @@ export default function OpenGraphImage() {
     (
       <div
         style={{
-          background: "linear-gradient(135deg, #f8fafc 0%, #ecfdf5 50%, #f0fdf4 100%)",
+          background: "linear-gradient(135deg, #f8fafc 0%, #e0f2fe 50%, #f0f9ff 100%)",
           width: "100%",
           height: "100%",
           display: "flex",
@@ -28,11 +28,11 @@ export default function OpenGraphImage() {
             width: 80,
             height: 80,
             borderRadius: 20,
-            background: "#059669",
+            background: "#2563eb",
             color: "white",
             fontSize: 32,
             fontWeight: 700,
-            boxShadow: "0 10px 40px rgba(5, 150, 105, 0.25)",
+            boxShadow: "0 10px 40px rgba(37, 99, 235, 0.28)",
           }}
         >
           VS

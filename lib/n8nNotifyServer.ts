@@ -17,50 +17,11 @@ export type N8nSubmitNotify = {
   error?: "fetch_failed" | "timeout";
 };
 
-export async function notifyN8nSubmitForRow(
-  data: Record<string, unknown>
+async function postSubmitWebhookWithTimeout(
+  webhookUrl: string,
+  webhookPayload: Record<string, unknown>,
+  timeoutMs: number
 ): Promise<N8nSubmitNotify> {
-  const rawSubmit =
-    process.env.N8N_WEBHOOK_URL?.trim() ||
-    process.env.N8N_VAT_Claim_URL?.trim();
-  const webhookUrl = getN8nSubmitWebhookUrl();
-  if (!webhookUrl) {
-    const skipReason = !rawSubmit ? "env_unset" : "env_invalid";
-    console.warn(
-      "[n8n notify-submit] skipped:",
-      skipReason === "env_unset"
-        ? "Set N8N_WEBHOOK_URL or N8N_VAT_Claim_URL for this Vercel environment (Preview and Production are separate)."
-        : "N8N webhook URL env is set but rejected (must be https:// for cloud, not a placeholder, no wrapping quotes)."
-    );
-    return { skipped: true, skipReason };
-  }
-
-  try {
-    console.log(
-      "[n8n notify-submit] POST",
-      new URL(webhookUrl).hostname
-    );
-  } catch {
-    console.log("[n8n notify-submit] POST (outbound to n8n webhook)");
-  }
-
-  const webhookPayload = {
-    event: "vat_claim_submitted",
-    source: "fraud-frontend",
-    submissionId: data.id,
-    company_name: data.company_name,
-    vat_number: data.vat_number,
-    claim_type: data.claim_type,
-    total_claim_amount: data.total_claim_amount,
-    status: data.status,
-    submission: data,
-  };
-
-  const webhookTimeoutMs = Math.min(
-    Math.max(Number(process.env.N8N_WEBHOOK_TIMEOUT_MS) || 8000, 3000),
-    55000
-  );
-
   try {
     const webhookRes = await fetch(webhookUrl, {
       method: "POST",
@@ -70,7 +31,7 @@ export async function notifyN8nSubmitForRow(
         "User-Agent": "VAT-Sentinel/1.0 (notify-submit)",
       },
       body: JSON.stringify(webhookPayload),
-      signal: AbortSignal.timeout(webhookTimeoutMs),
+      signal: AbortSignal.timeout(timeoutMs),
     });
     const webhookText = await webhookRes.text();
     if (!webhookRes.ok) {
@@ -103,6 +64,87 @@ export async function notifyN8nSubmitForRow(
       error: isTimeout ? "timeout" : "fetch_failed",
     };
   }
+}
+
+export async function notifyN8nSubmitForRow(
+  data: Record<string, unknown>
+): Promise<N8nSubmitNotify> {
+  const rawSubmit =
+    process.env.N8N_WEBHOOK_URL?.trim() ||
+    process.env.N8N_VAT_Claim_URL?.trim();
+  const webhookUrl = getN8nSubmitWebhookUrl();
+  if (!webhookUrl) {
+    const skipReason = !rawSubmit ? "env_unset" : "env_invalid";
+    console.warn(
+      "[n8n notify-submit] skipped:",
+      skipReason === "env_unset"
+        ? "Set N8N_WEBHOOK_URL or N8N_VAT_Claim_URL for this Vercel environment (Preview and Production are separate)."
+        : "N8N webhook URL env is set but rejected (must be https:// for cloud, not a placeholder, no wrapping quotes)."
+    );
+    return { skipped: true, skipReason };
+  }
+
+  try {
+    console.log(
+      "[n8n notify-submit] POST",
+      new URL(webhookUrl).hostname
+    );
+  } catch {
+    console.log("[n8n notify-submit] POST (outbound to n8n webhook)");
+  }
+
+  const webhookPayload = {
+    event: "vat_claim_submitted",
+    source: "fraud-frontend",
+    submissionId: data.id,
+    submission_id: data.id,
+    case_id: data.id,
+    company_name: data.company_name,
+    vat_number: data.vat_number,
+    claim_type: data.claim_type,
+    total_claim_amount: data.total_claim_amount,
+    status: data.status,
+    submission: data,
+  };
+
+  const webhookTimeoutMs = Math.min(
+    Math.max(Number(process.env.N8N_WEBHOOK_TIMEOUT_MS) || 30000, 5000),
+    55000
+  );
+
+  const firstTry = await postSubmitWebhookWithTimeout(
+    webhookUrl,
+    webhookPayload,
+    webhookTimeoutMs
+  );
+  if (firstTry.ok) return firstTry;
+
+  if (firstTry.error === "timeout" || firstTry.error === "fetch_failed") {
+    // One retry helps when n8n/cloud network has a transient delay.
+    const retryTimeoutMs = Math.min(webhookTimeoutMs + 5000, 55000);
+    console.warn(
+      "[n8n notify-submit] retrying once after transient failure",
+      firstTry.error
+    );
+    return postSubmitWebhookWithTimeout(
+      webhookUrl,
+      webhookPayload,
+      retryTimeoutMs
+    );
+  }
+
+  return firstTry;
+}
+
+function resolveReviewCaseId(params: {
+  id: string;
+  data: Record<string, unknown>;
+}): string {
+  const maybeCaseId = params.data.case_id;
+  if (typeof maybeCaseId === "string" && maybeCaseId.trim()) {
+    return maybeCaseId.trim();
+  }
+  return params.id;
 }
 
 export type N8nReviewNotify = {
@@ -144,6 +186,7 @@ export async function notifyN8nReviewDecision(params: {
   }
 
   const { id, status, data, reviewerEmail, reviewNotes } = params;
+  const caseId = resolveReviewCaseId({ id, data });
   const finalOutcome =
     status === "approved"
       ? "approved"
@@ -154,7 +197,7 @@ export async function notifyN8nReviewDecision(params: {
   const webhookPayload = {
     event: "submission_review_decision",
     source: "fraud-frontend-evaluator",
-    case_id: id,
+    case_id: caseId,
     submission_id: id,
     submissionId: id,
     new_status: status,

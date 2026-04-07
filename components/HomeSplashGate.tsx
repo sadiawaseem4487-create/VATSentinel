@@ -73,17 +73,17 @@ export function HomeSplashGate({ children }: { children: React.ReactNode }) {
       {children}
       {splash === "show" ? (
         <div
-          className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-gradient-to-b from-slate-50 via-white to-emerald-50/40 px-6 transition-opacity duration-300 ease-out ${
+          className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-gradient-to-b from-slate-50 via-white to-sky-50/50 px-6 transition-opacity duration-300 ease-out ${
             fading ? "pointer-events-none opacity-0" : "opacity-100"
           }`}
           aria-busy="true"
           aria-label="Welcome"
         >
           <div className="mx-auto max-w-lg text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-600 text-lg font-bold tracking-tight text-white shadow-lg shadow-emerald-900/15 ring-1 ring-emerald-700/20">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 text-lg font-bold tracking-tight text-white shadow-lg shadow-blue-900/20 ring-1 ring-blue-700/25">
               VS
             </div>
-            <p className="mt-6 text-xs font-semibold uppercase tracking-[0.14em] text-emerald-800/90">
+            <p className="mt-6 text-xs font-semibold uppercase tracking-[0.14em] text-blue-900/90">
               Finland pilot · Demo
             </p>
             <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
@@ -95,7 +95,7 @@ export function HomeSplashGate({ children }: { children: React.ReactNode }) {
             </p>
             <ol className="mt-8 space-y-3 text-left text-sm text-slate-700">
               <li className="flex gap-3 rounded-xl border border-slate-200/90 bg-white/90 px-4 py-3 shadow-sm">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-xs font-bold text-emerald-900">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sky-100 text-xs font-bold text-blue-900">
                   1
                 </span>
                 <span>
@@ -104,7 +104,7 @@ export function HomeSplashGate({ children }: { children: React.ReactNode }) {
                 </span>
               </li>
               <li className="flex gap-3 rounded-xl border border-slate-200/90 bg-white/90 px-4 py-3 shadow-sm">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-xs font-bold text-emerald-900">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sky-100 text-xs font-bold text-blue-900">
                   2
                 </span>
                 <span>
@@ -113,7 +113,7 @@ export function HomeSplashGate({ children }: { children: React.ReactNode }) {
                 </span>
               </li>
               <li className="flex gap-3 rounded-xl border border-slate-200/90 bg-white/90 px-4 py-3 shadow-sm">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-xs font-bold text-emerald-900">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sky-100 text-xs font-bold text-blue-900">
                   3
                 </span>
                 <span>
@@ -129,7 +129,7 @@ export function HomeSplashGate({ children }: { children: React.ReactNode }) {
           <button
             type="button"
             onClick={skip}
-            className="mt-10 text-sm font-semibold text-emerald-800 underline decoration-emerald-400/80 underline-offset-4 transition hover:text-emerald-950"
+            className="mt-10 text-sm font-semibold text-blue-800 underline decoration-blue-400/80 underline-offset-4 transition hover:text-blue-950"
           >
             Skip
           </button>

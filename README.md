@@ -64,6 +64,16 @@ Open **http://localhost:3947** (dev server port is set in `package.json`).
 4. **Auth:** If the Webhook node uses **Authentication**, the app must send the same credentials (currently it sends JSON only — disable webhook auth for this integration or add headers in code).
 5. After submit, the success banner mentions if n8n was skipped or returned an error (HTTP status). Check **Vercel → Deployment → Functions / Logs** for `n8n webhook non-OK` if needed.
 
+### n8n review webhook (Approve / Reject on dashboard)
+
+The app POSTs to `N8N_REVIEW_WEBHOOK_URL` with JSON including `submissionId`, `submission_id`, `case_id`, `new_status`, `review_notes`, etc.
+
+1. **Lookup the AI row by `submission_id`:** The submit workflow writes `fraud_workflow_results` with **`submission_id`** (same UUID as `submissions.id`). A Supabase “get rows” node that filters by **`case_id` only** will fail unless you also store that column when the row is created. Prefer **`submission_id` = webhook submission UUID** for the review “Fetch case” step.
+2. **Map webhook body:** After the Webhook node, use a **Set** node (not a manual “wait for input” step) to read `$json.body.submissionId` (and fallbacks) into fields used by the next node.
+3. **Respond early** in n8n if the chain is slow, so the HTTP request does not time out.
+
+Reference workflow JSON (`n8n/VAT-sentinel-model-2-copy.fixed.json`) is updated so **Fetch Case** filters `fraud_workflow_results` by **`submission_id`** and **Review Input** maps from the webhook body.
+
 ## Requirements
 
 - **Node.js** 20+ (see `engines` in `package.json`).
